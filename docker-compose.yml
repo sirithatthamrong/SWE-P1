@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    container_name: lab_db
+    environment:
+      POSTGRES_USER: lab_user
+      POSTGRES_PASSWORD: lab_password
+      POSTGRES_DB: lab_db
+    ports:
+      - "5432:5432"
+    volumes:
+        - lab_db_data:/var/lib/postgresql/data
+    networks:
+        - lab_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: lab_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+        - lab_network
+
+  web:
+    build: .
+    container_name: lab_web
+    env_file:
+      - .env
+    ports:
+        - "10000:10000"
+    depends_on:
+      - db
+    networks:
+        - lab_network
+
+networks:
+  lab_network:
+    driver: bridge
+
+volumes:
+    lab_db_data:
+      driver: local
+
