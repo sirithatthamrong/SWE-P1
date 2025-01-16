@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LabSync{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <script defer src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">LabSync</div>
+        <ul class="nav">
+            <li><a href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#"><i class="fas fa-calendar"></i> Calendar</a></li>
+            <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> Reports</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+            <span>LabSync</span>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+</body>
+</html>

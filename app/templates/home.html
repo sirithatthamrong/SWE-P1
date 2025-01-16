@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - LabSync{% endblock %}
+
+{% block content %}
+    <h2>Welcome, {{ session['username'] }}</h2>
+    <div class="welcome-container">
+        <img src="{{ url_for('static', filename='images/piti.png') }}" alt="User" class="user-image">
+        <div class="thought-bubble">
+            <p>Let’s start working!</p>
+        </div>
+    </div>
+{% endblock %}
