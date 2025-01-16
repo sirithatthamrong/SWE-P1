@@ -1,0 +1,198 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f2f6fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Main Container */
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 1000px;
+    background-color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Form Section */
+.form-container {
+    flex: 1;
+    padding: 40px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 450px;
+}
+
+/* Ensure the form always takes the same space */
+.form-content {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 280px; /* FIXED HEIGHT */
+}
+
+/* Tab Toggle */
+.form-header {
+    display: flex;
+    justify-content: center;
+    background-color: #e7eff9;
+    padding: 6px;
+    border-radius: 50px;
+    width: 220px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Tab Buttons */
+.tab-button {
+    flex: 1;
+    border: none;
+    font-size: 16px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+    font-weight: bold;
+    background: none;
+    color: #333;
+}
+
+.tab-button.active {
+    background-color: #2f80ed;
+    color: white;
+    box-shadow: 0 3px 8px rgba(47, 128, 237, 0.2);
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Form Inputs */
+form input {
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background-color: white;
+}
+
+form input:focus {
+    border-color: #2f80ed;
+    outline: none;
+    box-shadow: 0px 0px 10px rgba(47, 128, 237, 0.3);
+}
+
+/* Buttons */
+.form-button {
+    padding: 12px;
+    background-color: #2f80ed;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-button:hover {
+    background-color: #246acb;
+    transform: scale(1.05);
+}
+
+/* Logo Section */
+.logo-container {
+    flex: 1;
+    background-color: #dce6f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    max-width: 160px;
+    height: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        width: 90%;
+    }
+}
+
+/* Flash Messages */
+.flash-messages {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 15px;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Success Message */
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Error Message */
+.alert.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Warning Message */
+.alert.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Info Message */
+.alert.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
