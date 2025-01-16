@@ -13,13 +13,14 @@
                 <button class="tab-button" onclick="location.href='{{ url_for('main.login') }}'">LOGIN</button>
                 <button class="tab-button active">SIGNUP</button>
             </div>
-            <form method="POST">
-                <input type="text" name="username" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <button type="submit" class="form-button">SIGNUP</button>
-            </form>
+            <div class="form-content">
+                <form method="POST">
+                    <input type="text" name="username" placeholder="Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit" class="form-button">SIGNUP</button>
+                </form>
+            </div>
         </div>
         <div class="logo-container">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LabSync Logo" class="logo">
