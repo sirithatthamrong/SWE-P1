@@ -7,11 +7,13 @@ CREATE TYPE task_required_role AS ENUM ( 'admin', 'technician','user');
 CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high');
 CREATE TYPE task_status AS ENUM ('pending', 'in progress', 'completed', 'overdue');
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
-    password VARCHAR(100) NOT NULL,
+    password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     role user_role DEFAULT 'user',
     notification_enabled BOOLEAN DEFAULT TRUE
@@ -57,8 +59,6 @@ CREATE TABLE RoomEquipment (
     FOREIGN KEY (lab_room_id) REFERENCES LabRooms(lab_room_id) ON DELETE CASCADE,
     FOREIGN KEY (equipment_id) REFERENCES EquipmentTypes(equipment_id) ON DELETE CASCADE
 );
-
-CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 CREATE TABLE RoomReservations (
     reservation_id SERIAL PRIMARY KEY,
