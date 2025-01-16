@@ -10,6 +10,7 @@ from flask import (Blueprint,
 from sqlalchemy import text
 from functools import wraps
 from app import db
+from app.services.auth_service import signup_user, login_user, login_required
 
 
 main = Blueprint('main', __name__)
@@ -24,16 +25,6 @@ def health_check():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash("You must be logged in to access this page.", "danger")
-            return redirect(url_for('main.login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 @main.route('/')
 @login_required
 def home():
@@ -42,28 +33,12 @@ def home():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    # if 'user_id' in session: return redirect(url_for('main.home'))
-
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        query = text(
-            "SELECT user_id, password FROM Users WHERE username = :username"
-        )
-        result = db.session.execute(query, {'username': username}).fetchone()
-
-        if result:
-            user_id, stored_password = result
-
-            if password == stored_password:
-                session['user_id'] = user_id
-                flash("Login successful!", "success")
-                return redirect(url_for('main.home'))
-            else:
-                flash("Invalid credentials.", "danger")
-        else:
-            flash("User not found.", "danger")
+        if login_user(username, password):
+            return redirect(url_for('main.home'))
 
     return render_template('login.html')
 
@@ -75,24 +50,8 @@ def signup():
         email = request.form['email']
         password = request.form['password']
 
-        query = text("SELECT username FROM Users WHERE username = :username")
-        result = db.session.execute(query, {'username': username}).fetchone()
-
-        if result:
-            flash("Username already taken. Please choose another one.", "danger")
-            return redirect(url_for('main.signup'))
-
-        try:
-            query = text(
-                "INSERT INTO Users (username, email, password) VALUES (:username, :email, :password)"
-            )
-            db.session.execute(query, {'username': username, 'email': email, 'password': password})
-            db.session.commit()
-            flash("Signup successful! Please log in.", "success")
+        if signup_user(username, email, password):
             return redirect(url_for('main.login'))
-        except Exception as e:
-            flash(f"Signup failed: {str(e)}", "danger")
-            return redirect(url_for('main.signup'))
 
     return render_template('signup.html')
 
@@ -102,4 +61,3 @@ def logout():
     session.clear()
     flash("You have been logged out.", "info")
     return redirect(url_for('main.login'))
-
