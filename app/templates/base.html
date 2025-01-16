@@ -6,34 +6,33 @@
     <title>{% block title %}LabSync{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
     <script defer src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
-
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="logo">LabSync</div>
         <ul class="nav">
-            <li><a href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="#"><i class="fas fa-calendar"></i> Calendar</a></li>
-            <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
-            <li><a href="#"><i class="fas fa-file-alt"></i> Reports</a></li>
-            <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
-            <li><a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li class="topbar"> <i class="fas fa-bars menu-toggle"></i> </li>
+            <li><a href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> <span>Home</span></a></li>
+            <li><a href="#"><i class="fas fa-calendar"></i> <span>Calendar</span></a></li>
+            <li><a href="#"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> <span>Reports</span></a></li>
+            <li><a href="#"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
         </ul>
     </div>
 
+
     <!-- Main Content -->
     <div class="main-content">
-        <div class="topbar">
-            <button class="menu-toggle"><i class="fas fa-bars"></i></button>
-            <span>LabSync</span>
-        </div>
+<!--        <div class="topbar">-->
+<!--            <i class="fas fa-bars menu-toggle"></i>-->
+<!--        </div>-->
 
         <div class="content">
             {% block content %}{% endblock %}
         </div>
     </div>
-
 </body>
 </html>

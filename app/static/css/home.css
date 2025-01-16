@@ -1,4 +1,3 @@
-/* Reset */
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
@@ -8,11 +7,82 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 200px;
+    width: 150px;
     background: #e7eff9;
     display: flex;
     flex-direction: column;
     padding: 20px;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+/* Hide sidebar when inactive */
+.sidebar.hidden {
+    width: 25px; /* Keep only icons visible */
+}
+
+/* Hide text when sidebar is collapsed */
+.sidebar.hidden .nav a {
+    justify-content: center;
+}
+
+.sidebar.hidden .nav a span {
+    display: none; /* Hide text */
+}
+
+/* Adjust main content when sidebar is hidden */
+.main-content {
+    transition: margin-left 0.3s ease-in-out;
+    margin-left: 200px;
+}
+
+.main-content.expanded {
+    margin-left: 60px; /* Shift content when collapsed */
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: black;
+    outline: none;
+    z-index: 1000;
+}
+
+/* Position the topbar menu icon */
+.topbar .menu-toggle {
+    position: absolute;
+    left: 20px;
+    top: 10px;
+}
+
+/* Ensure sidebar icons remain visible */
+.sidebar .nav a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.sidebar .nav a i {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+/* When sidebar is collapsed, remove text spacing */
+.sidebar.hidden .nav a i {
+    margin-right: 0;
+}
+
+/* When sidebar is hidden, shift menu button */
+.sidebar.hidden .menu-toggle {
+    position: absolute;
+    left: 15px;
+    top: 15px;
 }
 
 .sidebar .logo {
@@ -48,16 +118,6 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-}
-
-/* Topbar */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    padding: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Welcome Section */
