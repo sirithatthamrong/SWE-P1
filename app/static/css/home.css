@@ -7,41 +7,69 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 150px;
+    width: 140px;
     background: #e7eff9;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 10px;
     position: fixed;
     height: 100vh;
     left: 0;
     top: 0;
-    transition: transform 0.3s ease-in-out;
+    transition: width 0.3s ease-in-out;
     overflow: hidden;
+    align-items: center; /* Center elements */
 }
 
-/* Hide sidebar when inactive */
+/* Sidebar Collapsed */
 .sidebar.hidden {
-    width: 25px; /* Keep only icons visible */
+    width: 50px; /* Icons remain visible */
 }
 
-/* Hide text when sidebar is collapsed */
+/* Sidebar Navigation */
+.sidebar .nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* Sidebar Items */
+.sidebar .nav li {
+    margin: 10px 0;
+}
+
+/* Sidebar Links */
+.sidebar .nav a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.sidebar .nav a:hover {
+    background: #d1e3f8;
+}
+
+/* Sidebar Icons */
+.sidebar .nav a i {
+    font-size: 20px;
+    margin-right: 12px;
+    transition: margin-right 0.3s ease-in-out;
+}
+
+/* When sidebar is collapsed, hide text */
+.sidebar.hidden .nav a span {
+    display: none;
+}
+
 .sidebar.hidden .nav a {
     justify-content: center;
-}
-
-.sidebar.hidden .nav a span {
-    display: none; /* Hide text */
-}
-
-/* Adjust main content when sidebar is hidden */
-.main-content {
-    transition: margin-left 0.3s ease-in-out;
-    margin-left: 200px;
-}
-
-.main-content.expanded {
-    margin-left: 60px; /* Shift content when collapsed */
 }
 
 .menu-toggle {
@@ -49,75 +77,26 @@ body {
     border: none;
     font-size: 24px;
     cursor: pointer;
-    color: black;
     outline: none;
-    z-index: 1000;
-}
-
-/* Position the topbar menu icon */
-.topbar .menu-toggle {
-    position: absolute;
-    left: 20px;
-    top: 10px;
-}
-
-/* Ensure sidebar icons remain visible */
-.sidebar .nav a {
-    display: flex;
-    align-items: center;
     padding: 10px;
-}
-
-.sidebar .nav a i {
-    font-size: 20px;
-    margin-right: 10px;
-}
-
-/* When sidebar is collapsed, remove text spacing */
-.sidebar.hidden .nav a i {
-    margin-right: 0;
-}
-
-/* When sidebar is hidden, shift menu button */
-.sidebar.hidden .menu-toggle {
-    position: absolute;
-    left: 15px;
-    top: 15px;
-}
-
-.sidebar .logo {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 30px;
-}
-
-.sidebar .nav {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar .nav li {
-    margin: 15px 0;
-}
-
-.sidebar .nav a {
-    text-decoration: none;
-    color: #333;
-    font-size: 16px;
     display: flex;
     align-items: center;
-}
-
-.sidebar .nav a i {
-    margin-right: 10px;
+    justify-content: center;
 }
 
 /* Main Content */
 .main-content {
+    transition: margin-left 0.3s ease-in-out;
+    margin-left: 160px;
     flex: 1;
     padding: 20px;
     display: flex;
     flex-direction: column;
+}
+
+/* When sidebar is collapsed */
+.main-content.expanded {
+    margin-left: 60px;
 }
 
 /* Welcome Section */
@@ -133,6 +112,7 @@ body {
     border-radius: 50%;
 }
 
+/* Thought Bubble */
 .thought-bubble {
     background: #ddd;
     padding: 20px;
@@ -161,4 +141,23 @@ body {
     left: -20px;
     top: 60%;
     border-radius: 50%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar.hidden {
+        width: 0;
+    }
+
+    .main-content {
+        margin-left: 60px;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
 }
