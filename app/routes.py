@@ -28,7 +28,7 @@ def health_check():
 @main.route('/')
 @login_required
 def home():
-    return jsonify({"message": "Welcome to the Flask App!"})
+    return render_template('home.html')
 
 
 @main.route('/login', methods=['GET', 'POST'])

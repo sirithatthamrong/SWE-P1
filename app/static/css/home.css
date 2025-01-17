@@ -1,0 +1,163 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 140px;
+    background: #e7eff9;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    transition: width 0.3s ease-in-out;
+    overflow: hidden;
+    align-items: center; /* Center elements */
+}
+
+/* Sidebar Collapsed */
+.sidebar.hidden {
+    width: 50px; /* Icons remain visible */
+}
+
+/* Sidebar Navigation */
+.sidebar .nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* Sidebar Items */
+.sidebar .nav li {
+    margin: 10px 0;
+}
+
+/* Sidebar Links */
+.sidebar .nav a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.sidebar .nav a:hover {
+    background: #d1e3f8;
+}
+
+/* Sidebar Icons */
+.sidebar .nav a i {
+    font-size: 20px;
+    margin-right: 12px;
+    transition: margin-right 0.3s ease-in-out;
+}
+
+/* When sidebar is collapsed, hide text */
+.sidebar.hidden .nav a span {
+    display: none;
+}
+
+.sidebar.hidden .nav a {
+    justify-content: center;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    outline: none;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Main Content */
+.main-content {
+    transition: margin-left 0.3s ease-in-out;
+    margin-left: 160px;
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* When sidebar is collapsed */
+.main-content.expanded {
+    margin-left: 60px;
+}
+
+/* Welcome Section */
+.welcome-container {
+    display: flex;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.user-image {
+    width: 150px;
+    height: auto;
+    border-radius: 50%;
+}
+
+/* Thought Bubble */
+.thought-bubble {
+    background: #ddd;
+    padding: 20px;
+    border-radius: 20px;
+    margin-left: 20px;
+    position: relative;
+}
+
+.thought-bubble::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background: #ddd;
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    border-radius: 50%;
+}
+
+.thought-bubble::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: #ddd;
+    position: absolute;
+    left: -20px;
+    top: 60%;
+    border-radius: 50%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar.hidden {
+        width: 0;
+    }
+
+    .main-content {
+        margin-left: 60px;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+}
