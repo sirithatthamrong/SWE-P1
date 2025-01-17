@@ -26,7 +26,7 @@ CREATE TABLE LabZones (
 
 CREATE TABLE LabRooms (
     lab_room_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     lab_zone_id INTEGER NOT NULL,
     location VARCHAR(100) NOT NULL,
     FOREIGN KEY (lab_zone_id) REFERENCES LabZones(lab_zone_id) ON DELETE CASCADE
