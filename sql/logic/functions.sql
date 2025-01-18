@@ -1,24 +1,24 @@
-CREATE OR REPLACE FUNCTION validate_room_reservation()
+CREATE OR REPLACE FUNCTION prevent_double_booking()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF EXISTS (
-        SELECT 1 FROM RoomReservations
-        WHERE user_id = NEW.user_id
-          AND (
-              (start_time < NEW.end_time AND end_time > NEW.start_time)
-          )
-    ) THEN
-        RAISE EXCEPTION 'User already has a reservation during this time.';
-    END IF;
-
+    -- Check if the room is already booked
     IF EXISTS (
         SELECT 1 FROM RoomReservations
         WHERE lab_room_id = NEW.lab_room_id
-          AND (
-              (start_time < NEW.end_time AND end_time > NEW.start_time)
-          )
+        AND date = NEW.date
+        AND (NEW.start_time < end_time AND NEW.end_time > start_time)
     ) THEN
-        RAISE EXCEPTION 'Lab room is already reserved during this time.';
+        RAISE EXCEPTION 'Room is already booked for the selected time!';
+    END IF;
+
+    -- Check if the user has overlapping booking
+    IF EXISTS (
+        SELECT 1 FROM RoomReservations
+        WHERE user_id = NEW.user_id
+        AND date = NEW.date
+        AND (NEW.start_time < end_time AND NEW.end_time > start_time)
+    ) THEN
+        RAISE EXCEPTION 'You already have a booking that overlaps with this time slot!';
     END IF;
 
     RETURN NEW;

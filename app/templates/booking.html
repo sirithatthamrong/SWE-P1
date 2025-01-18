@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Room Reservation</h2>
+
+<form id="booking-form">
+    <label for="lab_zone">Lab Zone:</label>
+    <select id="lab_zone" name="lab_zone">
+        <option value="">Select Lab Zone</option>
+        {% for zone in lab_zones %}
+            <option value="{{ zone.lab_zone_id }}">{{ zone.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="experiment_type">Experiment Type:</label>
+    <select id="experiment_type" name="experiment_type">
+        <option value="">Select Experiment Type</option>
+        {% for exp in experiment_types %}
+            <option value="{{ exp.experiment_id }}">{{ exp.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date">
+
+    <label for="start_time">Start Time:</label>
+    <input type="time" id="start_time" name="start_time">
+
+    <label for="end_time">End Time:</label>
+    <input type="time" id="end_time" name="end_time">
+
+    <button type="button" onclick="fetchAvailableRooms()">Check Availability</button>
+</form>
+
+<h3>Available Rooms</h3>
+<div id="available-rooms">
+    {% for room in all_rooms %}
+        <button onclick="selectRoom({{ room.lab_room_id }})">{{ room.name }}</button>
+    {% endfor %}
+</div>
+
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% endblock %}

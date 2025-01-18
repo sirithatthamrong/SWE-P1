@@ -1,4 +1,4 @@
-CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user');
+CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user', 'researcher');
 CREATE TYPE equipment_status AS ENUM ('available', 'needs maintenance');
 CREATE TYPE reservation_action AS ENUM ('created', 'cancelled', 'updated');
 CREATE TYPE inventory_action AS ENUM ('restocked', 'expired');
@@ -63,12 +63,14 @@ CREATE TABLE RoomEquipment (
 CREATE TABLE RoomReservations (
     reservation_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
+    lab_zone_id INTEGER NOT NULL,
     lab_room_id INTEGER NOT NULL,
     experiment_id INTEGER NOT NULL,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
-    experiment_name VARCHAR(255),
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (lab_zone_id) REFERENCES LabZones(lab_zone_id) ON DELETE CASCADE,
     FOREIGN KEY (lab_room_id) REFERENCES LabRooms(lab_room_id) ON DELETE CASCADE,
     FOREIGN KEY (experiment_id) REFERENCES ExperimentTypes(experiment_id) ON DELETE CASCADE,
     CHECK (start_time < end_time)
