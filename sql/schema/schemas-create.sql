@@ -1,9 +1,9 @@
-CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user');
+CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user', 'researcher');
 CREATE TYPE equipment_status AS ENUM ('available', 'needs maintenance');
 CREATE TYPE reservation_action AS ENUM ('created', 'cancelled', 'updated');
 CREATE TYPE inventory_action AS ENUM ('restocked', 'expired');
 CREATE TYPE maintenance_status AS ENUM ('scheduled', 'completed', 'overdue');
-CREATE TYPE task_required_role AS ENUM ( 'admin', 'technician','user');
+CREATE TYPE task_required_role AS ENUM ( 'admin', 'technician','user', 'researcher');
 CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high');
 CREATE TYPE task_status AS ENUM ('pending', 'in progress', 'completed', 'overdue');
 
@@ -161,7 +161,7 @@ CREATE TABLE Reports (
 
 CREATE TABLE TaskTypes (
     task_type_id SERIAL PRIMARY KEY,
-    task_name VARCHAR(100) NOT NULL,
+    task_name VARCHAR(100) NOT NULL UNIQUE ,
     required_role task_required_role NOT NULL
 );
 
