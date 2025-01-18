@@ -1,42 +1,70 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Room Reservation</h2>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LabSync{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+</head>
 
-<form id="booking-form">
-    <label for="lab_zone">Lab Zone:</label>
-    <select id="lab_zone" name="lab_zone">
-        <option value="">Select Lab Zone</option>
-        {% for zone in lab_zones %}
-            <option value="{{ zone.lab_zone_id }}">{{ zone.name }}</option>
-        {% endfor %}
-    </select>
+<div class="booking-container">
+    <!-- Filter Section (Left) -->
+    <div class="filter-section">
+        <h2>Room Reservation</h2>
+        <form id="booking-form">
+            <div class="form-group">
+                <label for="lab_zone">Lab Zone:</label>
+                <select id="lab_zone" name="lab_zone">
+                    <option value="">Select Lab Zone</option>
+                    {% for zone in lab_zones %}
+                    <option value="{{ zone.lab_zone_id }}">{{ zone.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    <label for="experiment_type">Experiment Type:</label>
-    <select id="experiment_type" name="experiment_type">
-        <option value="">Select Experiment Type</option>
-        {% for exp in experiment_types %}
-            <option value="{{ exp.experiment_id }}">{{ exp.name }}</option>
-        {% endfor %}
-    </select>
+            <div class="form-group">
+                <label for="experiment_type">Experiment Type:</label>
+                <select id="experiment_type" name="experiment_type">
+                    <option value="">Select Experiment Type</option>
+                    {% for exp in experiment_types %}
+                    <option value="{{ exp.experiment_id }}">{{ exp.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-    <label for="date">Date:</label>
-    <input type="date" id="date" name="date">
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date">
+            </div>
 
-    <label for="start_time">Start Time:</label>
-    <input type="time" id="start_time" name="start_time">
+            <div class="form-group">
+                <label for="start_time">Start Time:</label>
+                <input type="time" id="start_time" name="start_time">
+            </div>
 
-    <label for="end_time">End Time:</label>
-    <input type="time" id="end_time" name="end_time">
+            <div class="form-group">
+                <label for="end_time">End Time:</label>
+                <input type="time" id="end_time" name="end_time">
+            </div>
 
-    <button type="button" onclick="fetchAvailableRooms()">Check Availability</button>
-</form>
+            <button type="button" class="check-availability-btn" onclick="fetchAvailableRooms()">Check Availability
+            </button>
+        </form>
+    </div>
 
-<h3>Available Rooms</h3>
-<div id="available-rooms">
-    {% for room in all_rooms %}
-        <button onclick="selectRoom({{ room.lab_room_id }})">{{ room.name }}</button>
-    {% endfor %}
+    <!-- Available Rooms Section (Right) -->
+    <div class="available-rooms-container">
+        <h3>Available Rooms</h3>
+        <div id="available-rooms" class="room-grid"></div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <button onclick="prevPage()" id="prevBtn">&lt;</button>
+            <span id="page-number">1</span>
+            <button onclick="nextPage()" id="nextBtn"> &gt;</button>
+        </div>
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
