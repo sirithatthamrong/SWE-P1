@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetchAvailableRooms(); // Fetch all rooms when page loads
+    fetchAvailableRooms();
 });
 
 function fetchAvailableRooms() {
@@ -17,8 +17,8 @@ function fetchAvailableRooms() {
         if (data.available_rooms.length > 0) {
             data.available_rooms.forEach(room => {
                 let roomElement = document.createElement("button");
-                roomElement.textContent = room.name;
-                roomElement.onclick = () => selectRoom(room.lab_room_id);
+                roomElement.innerHTML = room.name;
+                roomElement.onclick = function () { selectRoom(room.lab_room_id); };
                 roomsContainer.appendChild(roomElement);
             });
         } else {
