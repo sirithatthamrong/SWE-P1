@@ -8,18 +8,28 @@ let totalRooms = [];
 let totalPages = 1;
 
 function fetchAvailableRooms() {
+    const dateField = document.getElementById("date");
+
+    if (!dateField.value) {
+        // alert("Please select a date before checking availability.");
+        dateField.style.border = "2px solid red";
+        return;
+    } else {
+        dateField.style.border = "";
+    }
+
     const formData = new FormData(document.getElementById("booking-form"));
 
     fetch('/booking', {
         method: 'POST',
         body: formData
     })
-        .then(response => response.json())
-        .then(data => {
-            totalRooms = data.available_rooms;
-            totalPages = Math.ceil(totalRooms.length / roomsPerPage);
-            displayRooms();
-        });
+    .then(response => response.json())
+    .then(data => {
+        totalRooms = data.available_rooms;
+        totalPages = Math.ceil(totalRooms.length / roomsPerPage);
+        displayRooms();
+    });
 }
 
 function displayRooms() {
@@ -58,5 +68,10 @@ function nextPage() {
 }
 
 function selectRoom(roomId) {
-    alert(`You selected room ID: ${roomId}`);
+    const selectedDate = document.getElementById("date").value;
+    // if (!selectedDate) {
+    //     alert("Please select a date before booking a room.");
+    //     return;
+    // }
+    window.location.href = `/booking/room/${roomId}?date=${selectedDate}`;
 }
