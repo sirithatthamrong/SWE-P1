@@ -22,6 +22,7 @@ from app.services.tasks_service import (
 
 main = Blueprint('main', __name__)
 
+
 # -------------------------------------------------------------------
 #                      Health Check
 # -------------------------------------------------------------------
@@ -42,6 +43,7 @@ def health_check():
 def home():
     return render_template('home.html')
 
+
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -50,6 +52,7 @@ def login():
         if login_user(username, password):
             return redirect(url_for('main.home'))
     return render_template('login.html')
+
 
 @main.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -60,6 +63,7 @@ def signup():
         if signup_user(username, email, password):
             return redirect(url_for('main.login'))
     return render_template('signup.html')
+
 
 @main.route('/logout')
 def logout():
@@ -107,6 +111,7 @@ def tasks_page():
         task_types=task_types
     )
 
+
 @main.route('/tasks/<int:task_id>/accept', methods=['POST'])
 @login_required
 def accept_task_route(task_id):
@@ -118,6 +123,7 @@ def accept_task_route(task_id):
         flash(response.get("error"), "danger")
     return redirect(url_for('main.tasks_page'))
 
+
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
 @login_required
 def complete_task_route(task_id):
@@ -128,6 +134,7 @@ def complete_task_route(task_id):
     else:
         flash(response.get("error"), "danger")
     return redirect(url_for('main.tasks_page'))
+
 
 @main.route('/tasks/<int:task_id>/delete', methods=['POST'])
 @login_required

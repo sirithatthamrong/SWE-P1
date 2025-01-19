@@ -84,6 +84,7 @@ def get_tasks_created_by_user(user_id):
         })
     return tasks
 
+
 def create_task(data, creator_id):
     """
     Create 1 row in Tasks, then multiple rows in TaskAssignments if user typed "1;2;3".
