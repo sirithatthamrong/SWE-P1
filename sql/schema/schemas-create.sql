@@ -177,6 +177,8 @@ CREATE TABLE Tasks (
     priority task_priority DEFAULT 'medium',
     status task_status DEFAULT 'pending',
     completed_at TIMESTAMP,
+    created_by INTEGER NOT NULL,
+    FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (task_type_id) REFERENCES TaskTypes(task_type_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES Users(user_id) ON DELETE CASCADE
 );

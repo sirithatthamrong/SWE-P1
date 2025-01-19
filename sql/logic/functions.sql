@@ -49,3 +49,40 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION accept_task(p_task_id INTEGER, p_user_id INTEGER)
+RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE Tasks
+    SET status = 'in progress',
+        updated_at = CURRENT_TIMESTAMP
+    WHERE task_id = p_task_id
+      AND assigned_to = p_user_id
+      AND status = 'pending';
+
+    IF FOUND THEN
+        RETURN TRUE; -- Task successfully updated
+    ELSE
+        RETURN FALSE; -- Task not updated (e.g., wrong status or user)
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION complete_task(p_task_id INTEGER, p_user_id INTEGER)
+RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE Tasks
+    SET status = 'completed',
+        completed_at = CURRENT_TIMESTAMP,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE task_id = p_task_id
+      AND assigned_to = p_user_id
+      AND status = 'in progress';
+
+    IF FOUND THEN
+        RETURN TRUE; -- Task successfully updated
+    ELSE
+        RETURN FALSE; -- Task not updated (e.g., wrong status or user)
+    END IF;
+END;
+$$ LANGUAGE plpgsql;

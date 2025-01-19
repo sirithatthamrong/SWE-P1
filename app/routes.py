@@ -1,5 +1,3 @@
-# app/routes.py
-
 from flask import (
     Blueprint,
     jsonify,
@@ -15,7 +13,13 @@ from sqlalchemy import text
 from functools import wraps
 from app import db
 from app.services.auth_service import signup_user, login_user, login_required
-from app.services.tasks_service import get_tasks_for_user, create_task
+from app.services.tasks_service import (
+    get_tasks_for_user,
+    get_tasks_created_by_user,  # NEW
+    create_task,
+    accept_task,       # NEW
+    complete_task      # NEW
+)
 
 main = Blueprint('main', __name__)
 
@@ -38,7 +42,6 @@ def health_check():
 @main.route('/')
 @login_required
 def home():
-    # Renders your "home.html"
     return render_template('home.html')
 
 
@@ -80,23 +83,21 @@ def tasks_page():
     if not user_id:
         return "User not found in session", 401
 
-    # 1. Handle POST: create a task
     if request.method == 'POST':
         data = request.form
-        response, status_code = create_task(data)
+        # create_task now uses creator_id to mark who made the task
+        response, status_code = create_task(data, creator_id=user_id)
         if status_code == 201:
             flash("Task created successfully!", "success")
         else:
             flash(response.get("error"), "danger")
-
         return redirect(url_for('main.tasks_page'))
 
-    # 2. Handle GET: display the page with tasks + TaskTypes dropdown
+    # GET: tasks assigned to user + tasks created by user
+    tasks_assigned = get_tasks_for_user(user_id)
+    my_created_tasks = get_tasks_created_by_user(user_id)
 
-    # Fetch user's tasks
-    tasks = get_tasks_for_user(user_id)
-
-    # Fetch all TaskTypes for the dropdown
+    # Fetch TaskTypes for the dropdown
     task_types_query = text("SELECT task_type_id, task_name FROM TaskTypes")
     task_types_result = db.session.execute(task_types_query).fetchall()
     task_types = [
@@ -104,5 +105,32 @@ def tasks_page():
         for row in task_types_result
     ]
 
-    # Render tasks.html, passing both tasks and task_types
-    return render_template('tasks.html', tasks=tasks, task_types=task_types)
+    return render_template(
+        'tasks.html',
+        tasks=tasks_assigned,
+        my_created_tasks=my_created_tasks,
+        task_types=task_types
+    )
+
+@main.route('/tasks/<int:task_id>/accept', methods=['POST'])
+@login_required
+def accept_task_route(task_id):
+    user_id = session.get('user_id')
+    response, status_code = accept_task(task_id, user_id)
+    if status_code == 200:
+        flash("Task accepted!", "success")
+    else:
+        flash(response.get("error"), "danger")
+    return redirect(url_for('main.tasks_page'))
+
+
+@main.route('/tasks/<int:task_id>/complete', methods=['POST'])
+@login_required
+def complete_task_route(task_id):
+    user_id = session.get('user_id')
+    response, status_code = complete_task(task_id, user_id)
+    if status_code == 200:
+        flash("Task completed!", "success")
+    else:
+        flash(response.get("error"), "danger")
+    return redirect(url_for('main.tasks_page'))
