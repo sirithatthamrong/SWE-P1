@@ -1,0 +1,233 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main Booking Container */
+.booking-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch; /* Ensures equal height */
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #eef3f7;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 30px;
+}
+
+/* --- Left Section: Filter Form --- */
+.filter-section {
+    flex: 1;
+    max-width: 30%;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Reduce Text Size */
+.filter-section h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+/* Form Styling */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+/* Labels */
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Inputs & Selects */
+.form-group select,
+.form-group input,
+.check-availability-btn {
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: white;
+}
+
+/* Make dropdowns aligned like other inputs */
+.form-group select {
+    appearance: none;
+    background: white;
+    cursor: pointer;
+}
+
+/* Date & Time Inputs */
+.form-group input[type="date"],
+.form-group input[type="time"] {
+    appearance: none;
+    background: white;
+    cursor: pointer;
+}
+
+/* Check Availability Button */
+.check-availability-btn {
+    width: 100%;
+    background-color: #74a9e3;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.check-availability-btn:hover {
+    background-color: #0056b3;
+}
+
+/* --- Right Section: Available Rooms --- */
+.available-rooms-container {
+    flex: 2;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Push pagination to bottom */
+}
+
+/* Available Rooms Title */
+.available-rooms-container h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    color: #2c3e50;
+}
+
+/* Grid Layout for Rooms */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 15px;
+    justify-content: center;
+    align-items: start; /* Ensures alignment */
+}
+
+/* Uniform Room Cards */
+.room-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;  /* Ensures all are equal */
+    width: 180px;  /* Fixed width */
+    background-color: #7e71b5;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    padding: 10px;
+    text-align: center;
+    white-space: normal;  /* Allows wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+/* Ensure Multi-line Text Stays Balanced */
+.room-btn span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+}
+
+/* Hover Effect on Rooms */
+.room-btn:hover {
+    background-color: #5b4b78;
+    transform: scale(1.05);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .room-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+/* --- Pagination Controls --- */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto; /* Pushes pagination to bottom */
+}
+
+.pagination button {
+    background: #74a9e3;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    margin: 0 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pagination button:hover {
+    background: #0056b3;
+}
+
+/* Page Number Styling */
+#page-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+    .booking-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .filter-section {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .available-rooms-container {
+        width: 100%;
+    }
+
+    .room-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+}

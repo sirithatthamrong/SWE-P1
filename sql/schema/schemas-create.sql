@@ -29,10 +29,10 @@ CREATE TABLE LabZones
 CREATE TABLE LabRooms
 (
     lab_room_id SERIAL PRIMARY KEY,
-    name        VARCHAR(100) NOT NULL,
-    lab_zone_id INTEGER      NOT NULL,
-    location    VARCHAR(100) NOT NULL,
-    FOREIGN KEY (lab_zone_id) REFERENCES LabZones (lab_zone_id) ON DELETE CASCADE
+    name VARCHAR(100) NOT NULL UNIQUE,
+    lab_zone_id INTEGER NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    FOREIGN KEY (lab_zone_id) REFERENCES LabZones(lab_zone_id) ON DELETE CASCADE
 );
 
 CREATE TABLE EquipmentTypes
@@ -69,14 +69,33 @@ CREATE TABLE RoomEquipment
 
 CREATE TABLE RoomReservations
 (
-    reservation_id  SERIAL PRIMARY KEY,
-    user_id         INTEGER   NOT NULL,
-    lab_room_id     INTEGER   NOT NULL,
-    experiment_id   INTEGER   NOT NULL,
-    start_time      TIMESTAMP NOT NULL,
-    end_time        TIMESTAMP NOT NULL,
-    experiment_name VARCHAR(255),
+    reservation_id SERIAL PRIMARY KEY,
+    user_id        INTEGER NOT NULL,
+    lab_zone_id    INTEGER NOT NULL,
+    lab_room_id    INTEGER NOT NULL,
+    experiment_id  INTEGER,
+    date           DATE    NOT NULL,
+    start_time     TIME    NOT NULL,
+    end_time       TIME    NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (lab_zone_id) REFERENCES LabZones (lab_zone_id) ON DELETE CASCADE,
+    FOREIGN KEY (lab_room_id) REFERENCES LabRooms (lab_room_id) ON DELETE CASCADE,
+    FOREIGN KEY (experiment_id) REFERENCES ExperimentTypes (experiment_id) ON DELETE CASCADE,
+    CHECK (start_time < end_time)
+);
+
+CREATE TABLE RoomReservations
+(
+    reservation_id SERIAL PRIMARY KEY,
+    user_id        INTEGER NOT NULL,
+    lab_zone_id    INTEGER NOT NULL,
+    lab_room_id    INTEGER NOT NULL,
+    experiment_id  INTEGER,
+    date           DATE    NOT NULL,
+    start_time     TIME    NOT NULL,
+    end_time       TIME    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (lab_zone_id) REFERENCES LabZones (lab_zone_id) ON DELETE CASCADE,
     FOREIGN KEY (lab_room_id) REFERENCES LabRooms (lab_room_id) ON DELETE CASCADE,
     FOREIGN KEY (experiment_id) REFERENCES ExperimentTypes (experiment_id) ON DELETE CASCADE,
     CHECK (start_time < end_time)
