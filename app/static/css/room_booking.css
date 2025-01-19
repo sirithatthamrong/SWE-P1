@@ -1,0 +1,150 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main Booking Container */
+.booking-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch; /* Ensures equal height */
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #d7e3f4;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 30px;
+}
+
+/* --- Left Section: Filter Form --- */
+.filter-section {
+    flex: 1;
+    max-width: 30%;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Reduce Text Size */
+.filter-section h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Form Styling */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+
+/* Labels */
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Inputs & Selects */
+.form-group select,
+.form-group input,
+.check-availability-btn {
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: white;
+}
+
+/* Make dropdowns aligned like other inputs */
+.form-group select {
+    appearance: none;
+    background: white;
+    cursor: pointer;
+}
+
+/* Date & Time Inputs */
+.form-group input[type="date"],
+.form-group input[type="time"] {
+    appearance: none;
+    background: white;
+    cursor: pointer;
+}
+
+/* Check Availability Button */
+.check-availability-btn {
+    width: 100%;
+    background-color: #74a9e3;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.check-availability-btn:hover {
+    background-color: #0056b3;
+}
+
+/* --- Right Section: Room Details --- */
+.room-details-container {
+    flex: 2;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.time-slots label {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: #007BFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.time-slots input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.confirm-booking-btn {
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.confirm-booking-btn:hover {
+    background-color: #0056b3;
+}

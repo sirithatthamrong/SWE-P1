@@ -65,7 +65,7 @@ CREATE TABLE RoomReservations (
     user_id INTEGER NOT NULL,
     lab_zone_id INTEGER NOT NULL,
     lab_room_id INTEGER NOT NULL,
-    experiment_id INTEGER NOT NULL,
+    experiment_id INTEGER,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
