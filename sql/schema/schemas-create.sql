@@ -171,7 +171,6 @@ CREATE TABLE Tasks (
     task_description TEXT NOT NULL,
     due_date DATE NOT NULL CHECK ( due_date >= CURRENT_DATE ),
     task_type_id INTEGER NOT NULL,
-    assigned_to INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     priority task_priority DEFAULT 'medium',
@@ -179,8 +178,15 @@ CREATE TABLE Tasks (
     completed_at TIMESTAMP,
     created_by INTEGER NOT NULL,
     FOREIGN KEY (created_by) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (task_type_id) REFERENCES TaskTypes(task_type_id) ON DELETE CASCADE,
-    FOREIGN KEY (assigned_to) REFERENCES Users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (task_type_id) REFERENCES TaskTypes(task_type_id) ON DELETE CASCADE
+);
+CREATE TABLE TaskAssignments (
+    assignment_id SERIAL PRIMARY KEY,
+    task_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE (task_id, user_id)
 );
 
 CREATE TABLE TaskLogs (

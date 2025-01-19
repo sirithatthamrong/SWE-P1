@@ -15,8 +15,6 @@ function openTab(event, tabName) {
 
 function showTaskModal(taskId) {
     const modal = document.getElementById('task-modal');
-
-    // Find the card
     const cardSelector = `.task-card[data-task-id="${taskId}"]`;
     const taskCard = document.querySelector(cardSelector);
     if (!taskCard) return;
@@ -26,6 +24,8 @@ function showTaskModal(taskId) {
     const taskDueDate = taskCard.dataset.dueDate;
     const taskPriority = taskCard.dataset.priority;
     const taskStatus = taskCard.dataset.status;
+    // "true" or "false"
+    const isOwned = (taskCard.dataset.owned === 'true');
 
     // Fill modal info
     document.getElementById('modal-task-title').textContent = taskName;
@@ -33,24 +33,30 @@ function showTaskModal(taskId) {
     document.getElementById('modal-task-due-date').textContent = taskDueDate;
     document.getElementById('modal-task-priority').textContent = taskPriority;
 
-    // Get the forms
+    // Accept/Complete forms
     const acceptForm = document.getElementById('acceptForm');
     const completeForm = document.getElementById('completeForm');
+    const deleteForm = document.getElementById('deleteForm');
 
-    // Hide both by default
+    // Hide them by default
     acceptForm.style.display = 'none';
     completeForm.style.display = 'none';
+    deleteForm.style.display = 'none';
 
-    // If status == 'pending', show acceptForm and set action to /tasks/<id>/accept
+    // If status == 'pending', show accept form
     if (taskStatus === 'pending') {
         acceptForm.style.display = 'block';
         acceptForm.action = `/tasks/${taskId}/accept`;
     }
-
-    // If status == 'in progress', show completeForm and set action to /tasks/<id>/complete
+    // If status == 'in progress', show complete form
     if (taskStatus === 'in progress') {
         completeForm.style.display = 'block';
         completeForm.action = `/tasks/${taskId}/complete`;
+    }
+    // If user owns the task, show delete form
+    if (isOwned) {
+        deleteForm.style.display = 'block';
+        deleteForm.action = `/tasks/${taskId}/delete`;
     }
 
     modal.style.display = 'block';

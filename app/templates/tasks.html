@@ -1,23 +1,99 @@
 {% extends 'base.html' %}
-
 {% block title %}Tasks{% endblock %}
 
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
-    <script defer src="{{ url_for('static', filename='js/tasks.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
+<script defer src="{{ url_for('static', filename='js/tasks.js') }}"></script>
 
-    <div class="high-priority-section">
-        <h2>High Priority Tasks</h2>
-        <div class="high-priority-tasks">
-            {% for task in tasks if task.priority == 'high' and (task.status == 'pending' or task.status == 'in progress') %}
-                <div class="task-card high-priority"
+<div class="high-priority-section">
+    <h2>High Priority Tasks</h2>
+    <div class="high-priority-tasks">
+        {% for task in tasks if task.priority == 'high' and (task.status == 'pending' or task.status == 'in progress') %}
+            <div class="task-card high-priority"
+                 data-task-id="{{ task.task_id }}"
+                 data-task-name="{{ task.task_name|escape }}"
+                 data-task-desc="{{ task.task_description|escape }}"
+                 data-due-date="{{ task.due_date }}"
+                 data-priority="{{ task.priority }}"
+                 data-status="{{ task.status }}"
+                 data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
+                 onclick="showTaskModal({{ task.task_id }})">
+                <h3>{{ task.task_name }}</h3>
+                <p><strong>Description:</strong> {{ task.task_description }}</p>
+                <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                <p><strong>Status:</strong> {{ task.status }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="tabs-section">
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'my-tasks')">My Tasks</button>
+        <button class="tab-button" onclick="openTab(event, 'in-progress')">In Progress</button>
+        <button class="tab-button" onclick="openTab(event, 'completed')">Completed</button>
+        <button class="tab-button" onclick="openTab(event, 'my-creations')">My Creations</button>
+        <button class="tab-button" onclick="openTab(event, 'create')">Create</button>
+    </div>
+
+    <!-- My Tasks tab -->
+    <div class="tab-content active" id="my-tasks">
+        <h3>Pending</h3>
+        <div class="task-list">
+            {% for task in tasks if task.status == 'pending' %}
+                <div class="task-card"
                      data-task-id="{{ task.task_id }}"
                      data-task-name="{{ task.task_name|escape }}"
                      data-task-desc="{{ task.task_description|escape }}"
                      data-due-date="{{ task.due_date }}"
                      data-priority="{{ task.priority }}"
                      data-status="{{ task.status }}"
+                     data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                      onclick="showTaskModal({{ task.task_id }})">
+                    <h3>{{ task.task_name }}</h3>
+                    <p><strong>Priority:</strong> {{ task.priority }}</p>
+                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- In Progress tab -->
+    <div class="tab-content" id="in-progress">
+        <h3>In Progress Tasks</h3>
+        <div class="task-list">
+            {% for task in tasks if task.status == 'in progress' %}
+                <div class="task-card"
+                     data-task-id="{{ task.task_id }}"
+                     data-task-name="{{ task.task_name|escape }}"
+                     data-task-desc="{{ task.task_description|escape }}"
+                     data-due-date="{{ task.due_date }}"
+                     data-priority="{{ task.priority }}"
+                     data-status="{{ task.status }}"
+                     data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
+                     onclick="showTaskModal({{ task.task_id }})">
+                    <h3>{{ task.task_name }}</h3>
+                    <p><strong>Description:</strong> {{ task.task_description }}</p>
+                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Completed tab -->
+    <div class="tab-content" id="completed">
+        <h3>Completed Tasks</h3>
+        <div class="task-list">
+            {% for task in tasks if task.status == 'completed' %}
+                <div class="task-card"
+                     data-task-id="{{ task.task_id }}"
+                     data-task-name="{{ task.task_name|escape }}"
+                     data-task-desc="{{ task.task_description|escape }}"
+                     data-due-date="{{ task.due_date }}"
+                     data-priority="{{ task.priority }}"
+                     data-status="{{ task.status }}"
+                     data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
+                >
                     <h3>{{ task.task_name }}</h3>
                     <p><strong>Description:</strong> {{ task.task_description }}</p>
                     <p><strong>Due Date:</strong> {{ task.due_date }}</p>
@@ -27,159 +103,95 @@
         </div>
     </div>
 
-    <div class="tabs-section">
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab(event, 'my-tasks')">My Tasks</button>
-            <button class="tab-button" onclick="openTab(event, 'in-progress')">In Progress</button>
-            <button class="tab-button" onclick="openTab(event, 'completed')">Completed</button>
-            <button class="tab-button" onclick="openTab(event, 'my-creations')">My Creations</button>
-            <button class="tab-button" onclick="openTab(event, 'create')">Create</button>
-        </div>
-
-        <!-- My Tasks tab -->
-        <div class="tab-content active" id="my-tasks">
-            <h3>Pending</h3>
-            <div class="task-list">
-                {% for task in tasks if task.status == 'pending' %}
-                    <div class="task-card"
-                         data-task-id="{{ task.task_id }}"
-                         data-task-name="{{ task.task_name|escape }}"
-                         data-task-desc="{{ task.task_description|escape }}"
-                         data-due-date="{{ task.due_date }}"
-                         data-priority="{{ task.priority }}"
-                         data-status="{{ task.status }}"
-                         onclick="showTaskModal({{ task.task_id }})">
-                        <h3>{{ task.task_name }}</h3>
-                        <p><strong>Priority:</strong> {{ task.priority }}</p>
-                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- In Progress tab -->
-        <div class="tab-content" id="in-progress">
-            <h3>In Progress Tasks</h3>
-            <div class="task-list">
-                {% for task in tasks if task.status == 'in progress' %}
-                    <div class="task-card"
-                         data-task-id="{{ task.task_id }}"
-                         data-task-name="{{ task.task_name|escape }}"
-                         data-task-desc="{{ task.task_description|escape }}"
-                         data-due-date="{{ task.due_date }}"
-                         data-priority="{{ task.priority }}"
-                         data-status="{{ task.status }}"
-                         onclick="showTaskModal({{ task.task_id }})">
-                        <h3>{{ task.task_name }}</h3>
-                        <p><strong>Description:</strong> {{ task.task_description }}</p>
-                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Completed tab -->
-        <div class="tab-content" id="completed">
-            <h3>Completed Tasks</h3>
-            <div class="task-list">
-                {% for task in tasks if task.status == 'completed' %}
-                    <div class="task-card"
-                         data-task-id="{{ task.task_id }}"
-                         data-task-name="{{ task.task_name|escape }}"
-                         data-task-desc="{{ task.task_description|escape }}"
-                         data-due-date="{{ task.due_date }}"
-                         data-priority="{{ task.priority }}"
-                         data-status="{{ task.status }}">
-                        <h3>{{ task.task_name }}</h3>
-                        <p><strong>Description:</strong> {{ task.task_description }}</p>
-                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                        <p><strong>Status:</strong> {{ task.status }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- My Creations tab -->
-        <div class="tab-content" id="my-creations">
-            <h3>Owned Tasks</h3>
-            <div class="task-list">
-                {% for task in my_created_tasks %}
-                    <div class="task-card"
-                         data-task-id="{{ task.task_id }}"
-                         data-task-name="{{ task.task_name|escape }}"
-                         data-task-desc="{{ task.task_description|escape }}"
-                         data-due-date="{{ task.due_date }}"
-                         data-priority="{{ task.priority }}"
-                         data-status="{{ task.status }}">
-                        <h3>{{ task.task_name }}</h3>
-                        <p><strong>Priority:</strong> {{ task.priority }}</p>
-                        <p><strong>Description:</strong> {{ task.task_description }}</p>
-                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                        <p><strong>Status:</strong> {{ task.status }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Create Task tab -->
-        <div class="tab-content" id="create">
-            <h3>Create a New Task</h3>
-            <form action="{{ url_for('main.tasks_page') }}" method="POST">
-                <label>Task Name:
-                    <input type="text" name="task_name">
-                </label><br><br>
-
-                <label>Task Description:
-                    <textarea name="task_description"></textarea>
-                </label><br><br>
-
-                <label>Due Date (YYYY-MM-DD):
-                    <input type="text" name="due_date">
-                </label><br><br>
-
-                <label>Task Type:
-                    <select name="task_type_id">
-                        {% for ttype in task_types %}
-                            <option value="{{ ttype.id }}">{{ ttype.name }}</option>
-                        {% endfor %}
-                    </select>
-                </label><br><br>
-
-                <label>Assigned To (User ID):
-                    <input type="number" name="assigned_to">
-                </label><br><br>
-
-                <label>Priority:
-                    <select name="priority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </label><br><br>
-
-                <button type="submit">Create Task</button>
-            </form>
+    <!-- My Creations tab -->
+    <div class="tab-content" id="my-creations">
+        <h3>Owned Tasks</h3>
+        <div class="task-list">
+            {% for task in my_created_tasks %}
+                <div class="task-card"
+                     data-task-id="{{ task.task_id }}"
+                     data-task-name="{{ task.task_name|escape }}"
+                     data-task-desc="{{ task.task_description|escape }}"
+                     data-due-date="{{ task.due_date }}"
+                     data-priority="{{ task.priority }}"
+                     data-status="{{ task.status }}"
+                     data-owned="true" <!-- because these are definitely owned by me -->
+                >
+                    <h3>{{ task.task_name }}</h3>
+                    <p><strong>Priority:</strong> {{ task.priority }}</p>
+                    <p><strong>Description:</strong> {{ task.task_description }}</p>
+                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                    <p><strong>Status:</strong> {{ task.status }}</p>
+                </div>
+            {% endfor %}
         </div>
     </div>
 
-    <!-- Task Modal -->
-    <div class="modal" id="task-modal">
-        <div class="modal-content">
-            <h3 id="modal-task-title"></h3>
-            <p id="modal-task-description"></p>
-            <p><strong>Due Date:</strong> <span id="modal-task-due-date"></span></p>
-            <p><strong>Priority:</strong> <span id="modal-task-priority"></span></p>
+    <!-- Create Task tab -->
+    <div class="tab-content" id="create">
+        <h3>Create a New Task</h3>
+        <form action="{{ url_for('main.tasks_page') }}" method="POST">
+            <label>Task Name:
+                <input type="text" name="task_name">
+            </label><br><br>
 
-            <!-- Hidden form for Accept -->
-            <form id="acceptForm" action="" method="POST" style="display: none;">
-                <button type="submit">Accept Task</button>
-            </form>
-            <!-- Hidden form for Complete -->
-            <form id="completeForm" action="" method="POST" style="display: none;">
-                <button type="submit">Complete Task</button>
-            </form>
+            <label>Task Description:
+                <textarea name="task_description"></textarea>
+            </label><br><br>
 
-            <button onclick="closeTaskModal()">Close</button>
-        </div>
+            <label>Due Date:
+                <!-- allow multiple user IDs with semicolons -->
+                <input type="date" name="due_date">
+            </label><br><br>
+
+            <label>Task Type:
+                <select name="task_type_id">
+                    {% for ttype in task_types %}
+                        <option value="{{ ttype.id }}">{{ ttype.name }}</option>
+                    {% endfor %}
+                </select>
+            </label><br><br>
+
+            <!-- changed to text so we can type "1;2;3" -->
+            <label>Assigned To (User IDs, semicolon separated):
+                <input type="text" name="assigned_to" placeholder="e.g. 1;2;3">
+            </label><br><br>
+
+            <label>Priority:
+                <select name="priority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </label><br><br>
+
+            <button type="submit">Create Task</button>
+        </form>
     </div>
+</div>
+
+<!-- Task Modal -->
+<div class="modal" id="task-modal">
+    <div class="modal-content">
+        <h3 id="modal-task-title"></h3>
+        <p id="modal-task-description"></p>
+        <p><strong>Due Date:</strong> <span id="modal-task-due-date"></span></p>
+        <p><strong>Priority:</strong> <span id="modal-task-priority"></span></p>
+
+        <!-- Accept -->
+        <form id="acceptForm" action="" method="POST" style="display: none;">
+            <button type="submit">Accept Task</button>
+        </form>
+        <!-- Complete -->
+        <form id="completeForm" action="" method="POST" style="display: none;">
+            <button type="submit">Complete Task</button>
+        </form>
+        <!-- Delete for the owner -->
+        <form id="deleteForm" action="" method="POST" style="display: none;">
+            <button type="submit" style="background-color: red; color: white;">Delete</button>
+        </form>
+
+        <button onclick="closeTaskModal()">Close</button>
+    </div>
+</div>
 {% endblock %}

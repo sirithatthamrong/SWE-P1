@@ -4,10 +4,11 @@ from datetime import datetime
 from sqlalchemy import text
 from app import db
 
+
 def get_tasks_for_user(user_id):
     """
-    Fetch tasks *assigned* to a specific user and ensure all tasks
-    that are high-priority appear, even if in progress.
+    Fetch tasks assigned to a specific user,
+    now that we store assignment in TaskAssignments.
     """
     query = text("""
         SELECT
@@ -20,12 +21,11 @@ def get_tasks_for_user(user_id):
             t.created_at,
             t.updated_at,
             t.created_by,
-            u.username AS assigned_by,
             tt.task_name AS task_type
         FROM Tasks t
-        JOIN Users u ON t.assigned_to = u.user_id
         JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
-        WHERE t.assigned_to = :user_id
+        JOIN TaskAssignments ta ON ta.task_id = t.task_id
+        WHERE ta.user_id = :user_id
         ORDER BY t.due_date ASC
     """)
 
@@ -43,14 +43,12 @@ def get_tasks_for_user(user_id):
             "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
             "created_by": row.created_by,
-            "assigned_by": row.assigned_by,
             "task_type": row.task_type
         })
     return tasks
+
+
 def get_tasks_created_by_user(user_id):
-    """
-    Fetch tasks CREATED by a specific user (i.e. tasks.created_by = user_id).
-    """
     query = text("""
         SELECT
             t.task_id,
@@ -62,10 +60,8 @@ def get_tasks_created_by_user(user_id):
             t.created_at,
             t.updated_at,
             t.created_by,
-            u.username AS assigned_user,
             tt.task_name AS task_type
         FROM Tasks t
-        JOIN Users u ON t.assigned_to = u.user_id
         JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
         WHERE t.created_by = :user_id
         ORDER BY t.created_at DESC
@@ -84,29 +80,28 @@ def get_tasks_created_by_user(user_id):
             "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
             "created_by": row.created_by,
-            "assigned_user": row.assigned_user,
             "task_type": row.task_type
         })
     return tasks
 
 def create_task(data, creator_id):
     """
-    Create a new task. 'creator_id' = the user who created the task.
-    The DB trigger 'tasks_validation' enforces certain constraints.
+    Create 1 row in Tasks, then multiple rows in TaskAssignments if user typed "1;2;3".
     """
     try:
+        # Validate basic fields
         required = ["task_name", "task_description", "due_date", "task_type_id", "assigned_to"]
         missing = [field for field in required if not data.get(field)]
         if missing:
             return {"error": f"Missing required field(s): {', '.join(missing)}"}, 400
 
-        query = text("""
+        # Insert into Tasks first
+        insert_task = text("""
             INSERT INTO Tasks (
                 task_name,
                 task_description,
                 due_date,
                 task_type_id,
-                assigned_to,
                 priority,
                 created_by,
                 created_at,
@@ -117,23 +112,40 @@ def create_task(data, creator_id):
                 :task_description,
                 :due_date,
                 :task_type_id,
-                :assigned_to,
                 :priority,
-                :created_by,
+                :creator_id,
                 CURRENT_TIMESTAMP,
                 CURRENT_TIMESTAMP
             )
+            RETURNING task_id
         """)
 
-        db.session.execute(query, {
-            "task_name": data.get("task_name"),
-            "task_description": data.get("task_description"),
-            "due_date": data.get("due_date"),
-            "task_type_id": data.get("task_type_id"),
-            "assigned_to": data.get("assigned_to"),
+        result = db.session.execute(insert_task, {
+            "task_name": data["task_name"],
+            "task_description": data["task_description"],
+            "due_date": data["due_date"],
+            "task_type_id": data["task_type_id"],
             "priority": data.get("priority", "medium"),
-            "created_by": creator_id
+            "creator_id": creator_id
         })
+        new_task_id = result.fetchone()[0]  # get the newly inserted task_id
+
+        # Now parse assigned_to for multiple user IDs: "1;2;3"
+        assigned_str = data["assigned_to"]
+        user_ids = [uid.strip() for uid in assigned_str.split(';') if uid.strip()]
+
+        # Insert into TaskAssignments for each user
+        insert_assignment = text("""
+            INSERT INTO TaskAssignments (task_id, user_id)
+            VALUES (:task_id, :user_id)
+        """)
+
+        for uid in user_ids:
+            db.session.execute(insert_assignment, {
+                "task_id": new_task_id,
+                "user_id": uid
+            })
+
         db.session.commit()
 
         return {"message": "Task created successfully!"}, 201
@@ -141,6 +153,7 @@ def create_task(data, creator_id):
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
+
 
 def accept_task(task_id, user_id):
     """

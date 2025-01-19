@@ -1,4 +1,4 @@
- /* tasks.css */
+/* tasks.css */
 
 /* General styles */
 body {
@@ -29,7 +29,10 @@ body {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    width: calc(40% - 10px); /* Adjusted width for larger cards */
+
+    /* Make cards narrower */
+    width: calc(30% - 10px);
+
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -37,26 +40,21 @@ body {
 }
 
 .task-card h3 {
-    font-size: 22px; /* Increased font size */
+    font-size: 22px;
     color: #333333;
 }
 
 .task-card p {
     margin: 5px 0;
     color: #555555;
-    font-size: 14px; /* Adjusted for better readability */
+    font-size: 14px;
 }
 
 .task-card:hover {
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/*!* High priority styling *!*/
-/*.high-priority {*/
-/*    border-left: 5px solid #ff4d4d;*/
-/*}*/
-
-/* Tabs styles */
+/* Tabs Section */
 .tabs-section {
     margin: 20px;
 }
@@ -94,10 +92,8 @@ body {
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
 }

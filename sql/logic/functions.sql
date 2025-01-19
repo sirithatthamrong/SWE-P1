@@ -31,16 +31,6 @@ CREATE OR REPLACE FUNCTION tasks_validation()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    -- Check required fields
-    IF NEW.task_name IS NULL
-        OR NEW.task_description IS NULL
-        OR NEW.due_date IS NULL
-        OR NEW.task_type_id IS NULL
-        OR NEW.assigned_to IS NULL THEN
-
-        RAISE EXCEPTION 'Missing required fields: name, description, due_date, task_type_id, assigned_to cannot be null';
-    END IF;
-
     -- Check due_date is in the future (or today)
     IF NEW.due_date < CURRENT_DATE THEN
         RAISE EXCEPTION 'Due date cannot be in the past.';
@@ -57,13 +47,17 @@ BEGIN
     SET status = 'in progress',
         updated_at = CURRENT_TIMESTAMP
     WHERE task_id = p_task_id
-      AND assigned_to = p_user_id
-      AND status = 'pending';
+      AND status = 'pending'
+      AND EXISTS (
+          SELECT 1 FROM TaskAssignments
+          WHERE task_id = p_task_id
+            AND user_id = p_user_id
+      );
 
     IF FOUND THEN
-        RETURN TRUE; -- Task successfully updated
+        RETURN TRUE; -- Task updated
     ELSE
-        RETURN FALSE; -- Task not updated (e.g., wrong status or user)
+        RETURN FALSE; -- Not updated
     END IF;
 END;
 $$ LANGUAGE plpgsql;

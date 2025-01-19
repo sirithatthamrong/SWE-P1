@@ -2,7 +2,6 @@ from flask import (
     Blueprint,
     jsonify,
     render_template,
-    Response,
     request,
     flash,
     redirect,
@@ -15,14 +14,13 @@ from app import db
 from app.services.auth_service import signup_user, login_user, login_required
 from app.services.tasks_service import (
     get_tasks_for_user,
-    get_tasks_created_by_user,  # NEW
+    get_tasks_created_by_user,
     create_task,
-    accept_task,       # NEW
-    complete_task      # NEW
+    accept_task,
+    complete_task
 )
 
 main = Blueprint('main', __name__)
-
 
 # -------------------------------------------------------------------
 #                      Health Check
@@ -44,7 +42,6 @@ def health_check():
 def home():
     return render_template('home.html')
 
-
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -53,7 +50,6 @@ def login():
         if login_user(username, password):
             return redirect(url_for('main.home'))
     return render_template('login.html')
-
 
 @main.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -65,7 +61,6 @@ def signup():
             return redirect(url_for('main.login'))
     return render_template('signup.html')
 
-
 @main.route('/logout')
 def logout():
     session.clear()
@@ -74,7 +69,7 @@ def logout():
 
 
 # -------------------------------------------------------------------
-#                      Tasks Page (View + Create)
+#                   Tasks Page (View + Create)
 # -------------------------------------------------------------------
 @main.route('/tasks', methods=['GET', 'POST'])
 @login_required
@@ -85,7 +80,7 @@ def tasks_page():
 
     if request.method == 'POST':
         data = request.form
-        # create_task now uses creator_id to mark who made the task
+        # create_task uses 'creator_id' to mark the user who made the task
         response, status_code = create_task(data, creator_id=user_id)
         if status_code == 201:
             flash("Task created successfully!", "success")
@@ -123,7 +118,6 @@ def accept_task_route(task_id):
         flash(response.get("error"), "danger")
     return redirect(url_for('main.tasks_page'))
 
-
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
 @login_required
 def complete_task_route(task_id):
@@ -133,4 +127,35 @@ def complete_task_route(task_id):
         flash("Task completed!", "success")
     else:
         flash(response.get("error"), "danger")
+    return redirect(url_for('main.tasks_page'))
+
+@main.route('/tasks/<int:task_id>/delete', methods=['POST'])
+@login_required
+def delete_task_route(task_id):
+    """
+    Only the user who created the task can delete it.
+    """
+    user_id = session.get('user_id')
+    try:
+        query = text("""
+            DELETE FROM Tasks
+            WHERE task_id = :task_id
+              AND created_by = :user_id
+            RETURNING task_id
+        """)
+        result = db.session.execute(query, {
+            "task_id": task_id,
+            "user_id": user_id
+        })
+        row = result.fetchone()
+        db.session.commit()
+
+        if row:
+            flash("Task deleted successfully!", "success")
+        else:
+            flash("You do not own this task or it does not exist.", "danger")
+    except Exception as e:
+        db.session.rollback()
+        flash(str(e), "danger")
+
     return redirect(url_for('main.tasks_page'))
