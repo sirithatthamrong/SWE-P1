@@ -84,23 +84,6 @@ CREATE TABLE RoomReservations
     CHECK (start_time < end_time)
 );
 
-CREATE TABLE RoomReservations
-(
-    reservation_id SERIAL PRIMARY KEY,
-    user_id        INTEGER NOT NULL,
-    lab_zone_id    INTEGER NOT NULL,
-    lab_room_id    INTEGER NOT NULL,
-    experiment_id  INTEGER,
-    date           DATE    NOT NULL,
-    start_time     TIME    NOT NULL,
-    end_time       TIME    NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
-    FOREIGN KEY (lab_zone_id) REFERENCES LabZones (lab_zone_id) ON DELETE CASCADE,
-    FOREIGN KEY (lab_room_id) REFERENCES LabRooms (lab_room_id) ON DELETE CASCADE,
-    FOREIGN KEY (experiment_id) REFERENCES ExperimentTypes (experiment_id) ON DELETE CASCADE,
-    CHECK (start_time < end_time)
-);
-
 CREATE TABLE RoomReservationLogs
 (
     log_id         SERIAL PRIMARY KEY,
@@ -218,6 +201,7 @@ CREATE TABLE Tasks
     FOREIGN KEY (created_by) REFERENCES Users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (task_type_id) REFERENCES TaskTypes (task_type_id) ON DELETE CASCADE
 );
+
 CREATE TABLE TaskAssignments
 (
     assignment_id SERIAL PRIMARY KEY,

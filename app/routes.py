@@ -214,19 +214,15 @@ def book_room(room_id):
         user_id = session.get('user_id')
         experiment_id = request.form.get('experiment_type')
 
-        # Ensure at least one time slot is selected
         if not selected_slots:
             return jsonify({"error": "Please select at least one time slot."}), 400
 
-        # Ensure user is not booking another room at the same time
         if has_overlapping_booking(user_id, date, selected_slots):
             return jsonify({"error": "You already have a conflicting booking for this time slot in another room."}), 400
 
-        # Ensure this room isn't already booked for the selected slots
         if is_room_already_booked(room_id, date, selected_slots):
             return jsonify({"error": "One or more selected slots are already booked."}), 400
 
-        # Insert Booking
         reservation_id = create_room_booking(user_id, room_id, experiment_id, date, selected_slots)
         if reservation_id:
             return jsonify({"success": "Booking confirmed!"})

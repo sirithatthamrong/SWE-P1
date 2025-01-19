@@ -29,11 +29,11 @@ def get_available_rooms(lab_zone_id=None, experiment_id=None, date=None, start_t
 
 def get_room_details(room_id):
     query = text("""
-            SELECT lr.lab_room_id, lr.name, lr.location, lz.name AS lab_zone
-            FROM LabRooms lr
-            JOIN LabZones lz ON lr.lab_zone_id = lz.lab_zone_id
-            WHERE lr.lab_room_id = :room_id
-        """)
+        SELECT lr.lab_room_id, lr.name, lr.location, lz.name AS lab_zone
+        FROM LabRooms lr
+        JOIN LabZones lz ON lr.lab_zone_id = lz.lab_zone_id
+        WHERE lr.lab_room_id = :room_id
+    """)
     return db.session.execute(query, {"room_id": room_id}).fetchone()
 
 
@@ -63,7 +63,6 @@ def get_available_time_slots(room_id, date):
     return db.session.execute(query, {"room_id": room_id, "date": date}).fetchall()
 
 
-
 def has_overlapping_booking(user_id, date, selected_slots):
     """Check if user has overlapping reservations, even in different rooms."""
     if not selected_slots:
@@ -88,10 +87,8 @@ def has_overlapping_booking(user_id, date, selected_slots):
     return db.session.execute(query, {
         "user_id": user_id,
         "date": date,
-        "selected_slots": list(selected_slots)  # Ensuring proper array format
+        "selected_slots": list(selected_slots)
     }).fetchone()
-
-
 
 
 def is_room_already_booked(room_id, date, selected_slots):
@@ -109,22 +106,18 @@ def is_room_already_booked(room_id, date, selected_slots):
     return db.session.execute(query, {
         "room_id": room_id,
         "date": date,
-        "selected_slots": list(selected_slots)  # Ensuring proper array format
+        "selected_slots": list(selected_slots)
     }).fetchone()
 
 
-
 def create_room_booking(user_id, room_id, experiment_id, date, selected_slots):
-    """Create a single reservation that spans consecutive selected slots"""
     try:
-        # Fetch lab_zone_id from LabRooms
         lab_zone_query = text("SELECT lab_zone_id FROM LabRooms WHERE lab_room_id = :room_id")
         lab_zone_id = db.session.execute(lab_zone_query, {"room_id": room_id}).scalar()
 
-        # Sort slots and find consecutive blocks
         sorted_slots = sorted([datetime.strptime(slot, "%H:%M:%S") for slot in selected_slots])
         start_time = sorted_slots[0]
-        end_time = sorted_slots[-1] + timedelta(hours=1)  # Extend to last selected slot
+        end_time = sorted_slots[-1] + timedelta(hours=1)
 
         query = text("""
             INSERT INTO RoomReservations (user_id, lab_zone_id, lab_room_id, experiment_id, date, start_time, end_time)
@@ -142,7 +135,6 @@ def create_room_booking(user_id, room_id, experiment_id, date, selected_slots):
         })
         reservation_id = result.fetchone()[0]
 
-        # Log the reservation action
         log_query = text("""
             INSERT INTO RoomReservationLogs (reservation_id, performed_by, action)
             VALUES (:reservation_id, :user_id, 'created')
