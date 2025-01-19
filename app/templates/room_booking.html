@@ -11,35 +11,43 @@
 <div class="booking-container">
     <!-- Left Section: Room Details -->
     <div class="room-info">
-        <a href="{{ url_for('main.booking') }}" class="back-arrow">⬅</a>
         <h2>{{ room_details.name }}</h2>
         <p><strong>Lab Zone:</strong> {{ room_details.lab_zone }}</p>
         <p><strong>Location:</strong> {{ room_details.location }}</p>
         <p><strong>Description:</strong> This room is used for experiments related to {{ room_details.lab_zone }}.</p>
+
+        <!-- Move Back Button to the bottom -->
+        <div class="room-info-footer">
+            <a href="{{ url_for('main.booking') }}" class="back-arrow">⬅ Back</a>
+        </div>
     </div>
 
     <!-- Right Section: Time Slot Selection -->
     <div class="schedule-container">
-        <h3>Book Available Slots</h3>
+        <h3>Book Available Slots: {{ selected_date }}</h3>
         <form id="booking-form">
-            <table>
+            <table class="booking-table">
                 <thead>
                     <tr>
-                        <th>Time</th>
+                        <th>Time Slot</th>
                         <th>Select</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for slot in available_slots %}
                     <tr>
-                        <td>{{ slot.start_time }} - {{ slot.end_time }}</td>  <!-- ✅ Display range -->
-                        <td><input type="checkbox" name="time_slot" value="{{ slot.start_time }}"></td>
+                        <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+                        <td>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" name="time_slot" value="{{ slot.start_time }}">
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            <button type="submit" class="book-btn" id="book-btn" disabled>Book</button>
+            <button type="submit" class="book-btn" id="book-btn" disabled>Confirm Booking</button>
         </form>
     </div>
 </div>

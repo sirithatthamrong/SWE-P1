@@ -124,7 +124,7 @@ def create_room_booking(user_id, room_id, experiment_id, date, selected_slots):
         # Sort slots and find consecutive blocks
         sorted_slots = sorted([datetime.strptime(slot, "%H:%M:%S") for slot in selected_slots])
         start_time = sorted_slots[0]
-        end_time = sorted_slots[-1] + timedelta(hours=1)  # ✅ Extend to last selected slot
+        end_time = sorted_slots[-1] + timedelta(hours=1)  # Extend to last selected slot
 
         query = text("""
             INSERT INTO RoomReservations (user_id, lab_zone_id, lab_room_id, experiment_id, date, start_time, end_time)

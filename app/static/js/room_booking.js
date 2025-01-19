@@ -1,24 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Select the "Book" button
     const bookBtn = document.getElementById("book-btn");
-
-    // Select all checkboxes
     const checkboxes = document.querySelectorAll("input[name='time_slot']");
 
-    // Function to enable/disable the button
     function updateButtonState() {
         const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-        bookBtn.disabled = !anyChecked; // Enable if at least one slot is checked
+        bookBtn.disabled = !anyChecked;
+        bookBtn.style.opacity = anyChecked ? "1" : "0.6";
     }
 
-    // Add event listeners to all checkboxes
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener("change", updateButtonState);
     });
 
-    // Form submission logic
     document.getElementById("booking-form").addEventListener("submit", function (e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
         let selectedSlots = [];
         document.querySelectorAll("input[name='time_slot']:checked").forEach((checkbox) => {
@@ -41,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 alert("✅ Booking confirmed!");
-                window.location.href = "/booking"; // Redirect after successful booking
+                window.location.href = "/booking";
             } else {
                 alert(`❌ Error: ${data.error}`);
             }
@@ -51,9 +46,4 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("❌ Booking failed. Please try again.");
         });
     });
-});
-
-
-document.getElementById("date").addEventListener("change", function() {
-    document.getElementById("book-btn").disabled = true;
 });

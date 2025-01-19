@@ -122,7 +122,8 @@ def book_room(room_id):
         room_details=room_details,
         available_slots=available_slots,
         lab_zones=get_lab_zones(),
-        experiment_types=get_experiment_types()
+        experiment_types=get_experiment_types(),
+        selected_date=date
     )
 
 
