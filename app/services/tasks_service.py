@@ -6,7 +6,8 @@ from app import db
 
 def get_tasks_for_user(user_id):
     """
-    Fetch tasks *assigned* to a specific user.
+    Fetch tasks *assigned* to a specific user and ensure all tasks
+    that are high-priority appear, even if in progress.
     """
     query = text("""
         SELECT
@@ -46,7 +47,6 @@ def get_tasks_for_user(user_id):
             "task_type": row.task_type
         })
     return tasks
-
 def get_tasks_created_by_user(user_id):
     """
     Fetch tasks CREATED by a specific user (i.e. tasks.created_by = user_id).

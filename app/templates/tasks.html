@@ -9,7 +9,7 @@
     <div class="high-priority-section">
         <h2>High Priority Tasks</h2>
         <div class="high-priority-tasks">
-            {% for task in tasks if task.priority == 'high' and task.status == 'pending' %}
+            {% for task in tasks if task.priority == 'high' and (task.status == 'pending' or task.status == 'in progress') %}
                 <div class="task-card high-priority"
                      data-task-id="{{ task.task_id }}"
                      data-task-name="{{ task.task_name|escape }}"
@@ -38,7 +38,7 @@
 
         <!-- My Tasks tab -->
         <div class="tab-content active" id="my-tasks">
-            <h3>My Tasks (Pending)</h3>
+            <h3>Pending</h3>
             <div class="task-list">
                 {% for task in tasks if task.status == 'pending' %}
                     <div class="task-card"
@@ -101,7 +101,7 @@
 
         <!-- My Creations tab -->
         <div class="tab-content" id="my-creations">
-            <h3>My Created Tasks</h3>
+            <h3>Owned Tasks</h3>
             <div class="task-list">
                 {% for task in my_created_tasks %}
                     <div class="task-card"
