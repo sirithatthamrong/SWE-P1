@@ -264,3 +264,12 @@ def book_room(room_id):
         experiment_types=get_experiment_types(),
         selected_date=date
     )
+
+
+# -------------------------------------------------------------------
+#                      My Calendar Page
+# -------------------------------------------------------------------
+@main.route('/calendar', methods=['GET', 'POST'])
+@login_required
+def calendar():
+    return render_template('calendar.html')
