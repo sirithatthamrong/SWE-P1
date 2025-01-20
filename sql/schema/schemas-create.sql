@@ -1,6 +1,6 @@
 CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user', 'researcher');
 CREATE TYPE equipment_status AS ENUM ('available', 'needs maintenance');
-CREATE TYPE reservation_action AS ENUM ('created', 'cancelled', 'updated');
+CREATE TYPE reservation_action AS ENUM ('created', 'canceled');
 CREATE TYPE inventory_action AS ENUM ('restocked', 'expired');
 CREATE TYPE maintenance_status AS ENUM ('scheduled', 'completed', 'overdue');
 CREATE TYPE task_required_role AS ENUM ( 'admin', 'technician','user', 'researcher');
@@ -90,7 +90,7 @@ CREATE TABLE RoomReservationLogs
     reservation_id INTEGER            NOT NULL,
     performed_by   INTEGER            NOT NULL,
     action_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    action         reservation_action NOT NULL,
+    action         reservation_action NOT NULL DEFAULT 'created',
     FOREIGN KEY (reservation_id) REFERENCES RoomReservations (reservation_id) ON DELETE CASCADE,
     FOREIGN KEY (performed_by) REFERENCES Users (user_id)
 );
