@@ -116,6 +116,7 @@
                          data-priority="{{ task.priority }}"
                          data-status="{{ task.status }}"
                          data-owned="true"
+                         onclick="showTaskModal({{ task.task_id }})"
                     >
                         <h3>{{ task.task_name }}</h3>
                         <p><strong>Priority:</strong> {{ task.priority }}</p>
