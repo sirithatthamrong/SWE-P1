@@ -9,8 +9,8 @@ from flask import (
     session
 )
 from sqlalchemy import text
-from functools import wraps
 from app import db
+from datetime import datetime
 from app.services.auth_service import signup_user, login_user, login_required
 from app.services.tasks_service import (
     get_tasks_for_user,
@@ -18,6 +18,19 @@ from app.services.tasks_service import (
     create_task,
     accept_task,
     complete_task
+)
+from app.services.booking_service import (
+    get_lab_zones, 
+    get_experiment_types, 
+    get_all_rooms, 
+    get_available_rooms,
+    get_room_details, 
+    get_available_time_slots, 
+    create_room_booking, 
+    has_overlapping_booking, 
+    is_room_already_booked,
+    cancel_room_booking,
+    get_upcoming_bookings
 )
 
 main = Blueprint('main', __name__)
@@ -166,3 +179,97 @@ def delete_task_route(task_id):
         flash(str(e), "danger")
 
     return redirect(url_for('main.tasks_page'))
+
+
+# -------------------------------------------------------------------
+#                      Booking Page
+# -------------------------------------------------------------------
+@main.route('/booking', methods=['GET', 'POST'])
+@login_required
+def booking():
+    if request.method == 'POST':
+        lab_zone_id = request.form.get('lab_zone')
+        experiment_id = request.form.get('experiment_type')
+        date = request.form.get('date')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
+
+        available_rooms = get_available_rooms(lab_zone_id, experiment_id, date, start_time, end_time)
+
+        return jsonify(
+            {"available_rooms": [{"lab_room_id": row.lab_room_id, "name": row.name} for row in available_rooms]}
+        )
+
+    upcoming_bookings = get_upcoming_bookings(session.get('user_id'))
+
+    return render_template(
+        'booking.html',
+        lab_zones=get_lab_zones(),
+        experiment_types=get_experiment_types(),
+        all_rooms=get_all_rooms(),
+        future_bookings=upcoming_bookings
+    )
+
+
+@main.route('/booking/cancel/<int:reservation_id>', methods=['POST'])
+@login_required
+def cancel_booking(reservation_id):
+    user_id = session.get('user_id')
+    success = cancel_room_booking(reservation_id, user_id)
+    if success:
+        return jsonify({"success": "Booking canceled successfully!"})
+    else:
+        return jsonify({"error": "Failed to cancel booking or unauthorized action."}), 400
+
+  
+@main.route('/booking/room/<int:room_id>', methods=['GET', 'POST'])
+@login_required
+def book_room(room_id):
+    date = request.args.get('date', None)
+
+    if date:
+        today = datetime.now().date()
+        selected_date = datetime.strptime(date, "%Y-%m-%d").date()
+        if selected_date < today:
+            return jsonify({"error": "You cannot book a past date."}), 400
+
+    if request.method == 'POST':
+        selected_slots = request.form.getlist('time_slot')
+        user_id = session.get('user_id')
+        experiment_id = request.form.get('experiment_type')
+
+        if not selected_slots:
+            return jsonify({"error": "Please select at least one time slot."}), 400
+
+        if has_overlapping_booking(user_id, date, selected_slots):
+            return jsonify({"error": "You already have a conflicting booking for this time slot in another room."}), 400
+
+        if is_room_already_booked(room_id, date, selected_slots):
+            return jsonify({"error": "One or more selected slots are already booked."}), 400
+
+        reservation_id = create_room_booking(user_id, room_id, experiment_id, date, selected_slots)
+        if reservation_id:
+            return jsonify({"success": "Booking confirmed!"})
+        else:
+            return jsonify({"error": "Booking failed, try again."}), 500
+
+    room_details = get_room_details(room_id)
+    available_slots = get_available_time_slots(room_id, date)
+
+    return render_template(
+        'room_booking.html',
+        room_details=room_details,
+        available_slots=available_slots,
+        lab_zones=get_lab_zones(),
+        experiment_types=get_experiment_types(),
+        selected_date=date
+    )
+
+
+# -------------------------------------------------------------------
+#                      My Calendar Page
+# -------------------------------------------------------------------
+@main.route('/calendar', methods=['GET', 'POST'])
+@login_required
+def calendar():
+    return render_template('calendar.html')
