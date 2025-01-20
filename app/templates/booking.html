@@ -67,8 +67,9 @@
     </div>
 </div>
 
-    <div class="recent-bookings-container">
-        <h3>Recent Activities - Upcoming Bookings</h3>
+<div class="recent-bookings-container">
+    <h3>📅 Recent Activities - Upcoming Bookings</h3>
+    <div class="table-wrapper">
         <table class="booking-table">
             <thead>
                 <tr>
@@ -81,17 +82,32 @@
             <tbody>
                 {% for booking in future_bookings %}
                 <tr id="booking-{{ booking.reservation_id }}">
-                    <td>{{ booking.room_name }}</td>
-                    <td>{{ booking.date }}</td>
-                    <td>{{ booking.start_time }} - {{ booking.end_time }}</td>
+                    <td><i class="fas fa-door-open"></i> {{ booking.room_name }}</td>
+                    <td><i class="fas fa-calendar-alt"></i> {{ booking.date }}</td>
+                    <td><i class="fas fa-clock"></i> {{ booking.start_time }} - {{ booking.end_time }}</td>
                     <td>
-                        <button class="cancel-btn" onclick="confirmCancel({{ booking.reservation_id }})">Cancel</button>
+                        <button class="cancel-btn" onclick="confirmCancel({{ booking.reservation_id }})">
+                            <i class="fas fa-times-circle"></i> Cancel
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure?</h3>
+        <p>You are about to cancel this booking.</p>
+        <div class="modal-buttons">
+            <button onclick="cancelBooking()" class="confirm-btn">Yes, Cancel</button>
+            <button onclick="closeModal()" class="close-btn">No, Keep</button>
+        </div>
+    </div>
+</div>
 
 <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
 {% endblock %}

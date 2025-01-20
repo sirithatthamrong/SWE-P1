@@ -73,28 +73,32 @@ function selectRoom(roomId) {
     window.location.href = `/booking/room/${roomId}?date=${selectedDate}`;
 }
 
-function confirmCancel(reservationId) {
-    if (!confirm("Are you sure you want to cancel this booking?")) {
-        return;
-    }
+let cancelId = null;
 
-    fetch(`/booking/cancel/${reservationId}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        }
+function confirmCancel(bookingId) {
+    cancelId = bookingId;
+    document.getElementById("confirmModal").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("confirmModal").style.display = "none";
+}
+
+function cancelBooking() {
+    if (!cancelId) return;
+
+    fetch(`/booking/cancel/${cancelId}`, {
+        method: "POST"
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert("✅ Booking successfully canceled!");
-            document.getElementById(`booking-${reservationId}`).remove();
+            document.getElementById(`booking-${cancelId}`).remove();
+            alert("Booking canceled successfully!");
         } else {
-            alert(`❌ Error: ${data.error}`);
+            alert("Failed to cancel booking.");
         }
+        closeModal();
     })
-    .catch(error => {
-        console.error("Cancelation failed:", error);
-        alert("❌ Unable to cancel booking. Please try again.");
-    });
+    .catch(error => console.error("Error:", error));
 }
