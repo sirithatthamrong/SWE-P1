@@ -231,3 +231,38 @@ body {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     }
 }
+
+.recent-bookings-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #eef3f7;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 30px;
+}
+
+.recent-bookings-container h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.cancel-btn {
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.cancel-btn:hover {
+    background-color: #cc0000;
+}

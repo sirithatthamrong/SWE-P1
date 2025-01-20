@@ -10,6 +10,7 @@ from flask import (
 )
 from sqlalchemy import text
 from app import db
+from datetime import datetime
 from app.services.auth_service import signup_user, login_user, login_required
 from app.services.tasks_service import (
     get_tasks_for_user,
@@ -27,7 +28,9 @@ from app.services.booking_service import (
     get_available_time_slots, 
     create_room_booking, 
     has_overlapping_booking, 
-    is_room_already_booked
+    is_room_already_booked,
+    cancel_room_booking,
+    get_upcoming_bookings
 )
 
 main = Blueprint('main', __name__)
@@ -194,20 +197,41 @@ def booking():
         available_rooms = get_available_rooms(lab_zone_id, experiment_id, date, start_time, end_time)
 
         return jsonify(
-            {"available_rooms": [{"lab_room_id": row.lab_room_id, "name": row.name} for row in available_rooms]})
+            {"available_rooms": [{"lab_room_id": row.lab_room_id, "name": row.name} for row in available_rooms]}
+        )
+
+    upcoming_bookings = get_upcoming_bookings(session.get('user_id'))
 
     return render_template(
         'booking.html',
         lab_zones=get_lab_zones(),
         experiment_types=get_experiment_types(),
-        all_rooms=get_all_rooms()
+        all_rooms=get_all_rooms(),
+        future_bookings=upcoming_bookings
     )
+
+
+@main.route('/booking/cancel/<int:reservation_id>', methods=['POST'])
+@login_required
+def cancel_booking(reservation_id):
+    user_id = session.get('user_id')
+    success = cancel_room_booking(reservation_id, user_id)
+    if success:
+        return jsonify({"success": "Booking canceled successfully!"})
+    else:
+        return jsonify({"error": "Failed to cancel booking or unauthorized action."}), 400
 
   
 @main.route('/booking/room/<int:room_id>', methods=['GET', 'POST'])
 @login_required
 def book_room(room_id):
     date = request.args.get('date', None)
+
+    if date:
+        today = datetime.now().date()
+        selected_date = datetime.strptime(date, "%Y-%m-%d").date()
+        if selected_date < today:
+            return jsonify({"error": "You cannot book a past date."}), 400
 
     if request.method == 'POST':
         selected_slots = request.form.getlist('time_slot')

@@ -16,7 +16,8 @@ def get_all_rooms():
 
 
 def get_available_rooms(lab_zone_id=None, experiment_id=None, date=None, start_time=None, end_time=None):
-    query = text("SELECT * FROM get_available_rooms(:p_lab_zone_id, :p_experiment_id, :p_date, :p_start_time, :p_end_time)")
+    query = text(
+        "SELECT * FROM get_available_rooms(:p_lab_zone_id, :p_experiment_id, :p_date, :p_start_time, :p_end_time)")
     params = {
         "p_lab_zone_id": lab_zone_id if lab_zone_id else None,
         "p_experiment_id": experiment_id if experiment_id else None,
@@ -148,3 +149,46 @@ def create_room_booking(user_id, room_id, experiment_id, date, selected_slots):
         db.session.rollback()
         print(f"Booking Error: {e}")
         return None
+
+
+def get_upcoming_bookings(user_id):
+    query = text("""
+        SELECT rr.reservation_id, rr.date, rr.start_time, rr.end_time, lr.name AS room_name
+        FROM RoomReservations rr
+        JOIN LabRooms lr ON rr.lab_room_id = lr.lab_room_id
+        WHERE rr.user_id = :user_id AND rr.date >= CURRENT_DATE
+        ORDER BY rr.date, rr.start_time;
+    """)
+
+    return db.session.execute(query, {"user_id": user_id}).fetchall()
+
+
+def cancel_room_booking(reservation_id, user_id):
+    """Cancel a room booking and log the action."""
+    try:
+        check_query = text("""
+            SELECT user_id FROM RoomReservations WHERE reservation_id = :reservation_id
+        """)
+        result = db.session.execute(check_query, {"reservation_id": reservation_id}).fetchone()
+
+        if result is None or result.user_id != user_id:
+            return False  # Unauthorized cancelation attempt
+
+        # Move the reservation to a log table (optional for tracking)
+        # log_query = text("""
+        #     INSERT INTO RoomReservationLogs (reservation_id, performed_by, action)
+        #     VALUES (:reservation_id, :user_id, CAST('canceled' AS reservation_action))
+        # """)
+        # db.session.execute(log_query, {"reservation_id": reservation_id, "user_id": user_id})
+
+        # Delete the reservation
+        delete_query = text("DELETE FROM RoomReservations WHERE reservation_id = :reservation_id")
+        db.session.execute(delete_query, {"reservation_id": reservation_id})
+
+        db.session.commit()
+        return True
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Cancelation Error: {e}")
+        return False

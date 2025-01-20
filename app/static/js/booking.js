@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     fetchAvailableRooms();
+    let today = new Date().toISOString().split("T")[0];
+    document.getElementById("date").setAttribute("min", today);
 });
 
 let roomsPerPage = 12;
@@ -11,7 +13,6 @@ function fetchAvailableRooms() {
     const dateField = document.getElementById("date");
 
     if (!dateField.value) {
-        // alert("Please select a date before checking availability.");
         dateField.style.border = "2px solid red";
         return;
     } else {
@@ -69,9 +70,31 @@ function nextPage() {
 
 function selectRoom(roomId) {
     const selectedDate = document.getElementById("date").value;
-    // if (!selectedDate) {
-    //     alert("Please select a date before booking a room.");
-    //     return;
-    // }
     window.location.href = `/booking/room/${roomId}?date=${selectedDate}`;
+}
+
+function confirmCancel(reservationId) {
+    if (!confirm("Are you sure you want to cancel this booking?")) {
+        return;
+    }
+
+    fetch(`/booking/cancel/${reservationId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Booking successfully canceled!");
+            document.getElementById(`booking-${reservationId}`).remove();
+        } else {
+            alert(`❌ Error: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        console.error("Cancelation failed:", error);
+        alert("❌ Unable to cancel booking. Please try again.");
+    });
 }

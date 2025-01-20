@@ -110,3 +110,22 @@ BEGIN
                                                AND (r.start_time < p_end_time AND r.end_time > p_start_time)));
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION log_cancelation()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    INSERT INTO RoomReservationLogs (reservation_id, performed_by, action)
+    VALUES (OLD.reservation_id, OLD.user_id, 'canceled'::reservation_action);
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_old_reservations()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    DELETE FROM RoomReservations WHERE date < CURRENT_DATE;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
