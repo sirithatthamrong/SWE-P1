@@ -84,7 +84,6 @@ def tasks_page():
 
     if request.method == 'POST':
         data = request.form
-        # create_task uses 'creator_id' to mark the user who made the task
         response, status_code = create_task(data, creator_id=user_id)
         if status_code == 201:
             flash("Task created successfully!", "success")
@@ -92,11 +91,14 @@ def tasks_page():
             flash(response.get("error"), "danger")
         return redirect(url_for('main.tasks_page'))
 
-    # GET: tasks assigned to user + tasks created by user
+    # --- On GET: read which tab should be active
+    active_tab = request.args.get('tab', 'my-tasks')
+
+    # get user tasks
     tasks_assigned = get_tasks_for_user(user_id)
     my_created_tasks = get_tasks_created_by_user(user_id)
 
-    # Fetch TaskTypes for the dropdown
+    # get TaskTypes
     task_types_query = text("SELECT task_type_id, task_name FROM TaskTypes")
     task_types_result = db.session.execute(task_types_query).fetchall()
     task_types = [
@@ -108,32 +110,47 @@ def tasks_page():
         'tasks.html',
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
-        task_types=task_types
+        task_types=task_types,
+        active_tab=active_tab  # pass to template
     )
 
 
 @main.route('/tasks/<int:task_id>/accept', methods=['POST'])
 @login_required
 def accept_task_route(task_id):
+    """
+    Called when user accepts a pending task.
+    We read ?tab=..., then redirect back to tasks_page with that tab.
+    """
     user_id = session.get('user_id')
+    next_tab = request.args.get('tab', 'my-tasks')  # default to 'my-tasks'
+
     response, status_code = accept_task(task_id, user_id)
     if status_code == 200:
         flash("Task accepted!", "success")
     else:
         flash(response.get("error"), "danger")
-    return redirect(url_for('main.tasks_page'))
+
+    return redirect(url_for('main.tasks_page', tab=next_tab))
 
 
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
 @login_required
 def complete_task_route(task_id):
+    """
+    Called when user completes a task in progress.
+    We read ?tab=..., then redirect back with that tab.
+    """
     user_id = session.get('user_id')
+    next_tab = request.args.get('tab', 'in-progress')  # default 'in-progress'
+
     response, status_code = complete_task(task_id, user_id)
     if status_code == 200:
         flash("Task completed!", "success")
     else:
         flash(response.get("error"), "danger")
-    return redirect(url_for('main.tasks_page'))
+
+    return redirect(url_for('main.tasks_page', tab=next_tab))
 
 
 @main.route('/tasks/<int:task_id>/delete', methods=['POST'])
@@ -141,8 +158,12 @@ def complete_task_route(task_id):
 def delete_task_route(task_id):
     """
     Only the user who created the task can delete it.
+    We'll read ?tab=..., then redirect back to that tab
+    (often 'my-creations').
     """
     user_id = session.get('user_id')
+    next_tab = request.args.get('tab', 'my-creations')
+
     try:
         query = text("""
             DELETE FROM Tasks
@@ -165,4 +186,4 @@ def delete_task_route(task_id):
         db.session.rollback()
         flash(str(e), "danger")
 
-    return redirect(url_for('main.tasks_page'))
+    return redirect(url_for('main.tasks_page', tab=next_tab))
