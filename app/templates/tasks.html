@@ -115,59 +115,59 @@
                          data-due-date="{{ task.due_date }}"
                          data-priority="{{ task.priority }}"
                          data-status="{{ task.status }}"
-                         data-owned="true" <!-- because these are definitely owned by me -->
+                         data-owned="true"
                     >
-                    <h3>{{ task.task_name }}</h3>
-                    <p><strong>Priority:</strong> {{ task.priority }}</p>
-                    <p><strong>Description:</strong> {{ task.task_description }}</p>
-                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                    <p><strong>Status:</strong> {{ task.status }}</p>
+                        <h3>{{ task.task_name }}</h3>
+                        <p><strong>Priority:</strong> {{ task.priority }}</p>
+                        <p><strong>Description:</strong> {{ task.task_description }}</p>
+                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                        <p><strong>Status:</strong> {{ task.status }}</p>
                     </div>
                 {% endfor %}
+            </div>
         </div>
-    </div>
 
-    <!-- Create Task tab -->
-    <div class="tab-content" id="create">
-        <h3>Create a New Task</h3>
-        <form action="{{ url_for('main.tasks_page') }}" method="POST">
-            <label>Task Name:
-                <input type="text" name="task_name">
-            </label><br><br>
+        <!-- Create Task tab -->
+        <div class="tab-content" id="create">
+            <h3>Create a New Task</h3>
+            <form action="{{ url_for('main.tasks_page') }}" method="POST">
+                <label>Task Name:
+                    <input type="text" name="task_name">
+                </label><br><br>
 
-            <label>Task Description:
-                <textarea name="task_description"></textarea>
-            </label><br><br>
+                <label>Task Description:
+                    <textarea name="task_description"></textarea>
+                </label><br><br>
 
-            <label>Due Date:
-                <!-- allow multiple user IDs with semicolons -->
-                <input type="date" name="due_date">
-            </label><br><br>
+                <label>Due Date:
+                    <!-- allow multiple user IDs with semicolons -->
+                    <input type="date" name="due_date">
+                </label><br><br>
 
-            <label>Task Type:
-                <select name="task_type_id">
-                    {% for ttype in task_types %}
-                        <option value="{{ ttype.id }}">{{ ttype.name }}</option>
-                    {% endfor %}
-                </select>
-            </label><br><br>
+                <label>Task Type:
+                    <select name="task_type_id">
+                        {% for ttype in task_types %}
+                            <option value="{{ ttype.id }}">{{ ttype.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label><br><br>
 
-            <!-- changed to text so we can type "1;2;3" -->
-            <label>Assigned To (User IDs, semicolon separated):
-                <input type="text" name="assigned_to" placeholder="e.g. 1;2;3">
-            </label><br><br>
+                <!-- changed to text so we can type "1;2;3" -->
+                <label>Assigned To (User IDs, semicolon separated):
+                    <input type="text" name="assigned_to" placeholder="e.g. 1;2;3">
+                </label><br><br>
 
-            <label>Priority:
-                <select name="priority">
-                    <option value="low">Low</option>
-                    <option value="medium" selected>Medium</option>
-                    <option value="high">High</option>
-                </select>
-            </label><br><br>
+                <label>Priority:
+                    <select name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </label><br><br>
 
-            <button type="submit">Create Task</button>
-        </form>
-    </div>
+                <button type="submit">Create Task</button>
+            </form>
+        </div>
     </div>
 
     <!-- Task Modal -->
