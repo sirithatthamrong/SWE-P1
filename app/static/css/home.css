@@ -142,22 +142,3 @@ body {
     top: 60%;
     border-radius: 50%;
 }
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 60px;
-    }
-
-    .sidebar.hidden {
-        width: 0;
-    }
-
-    .main-content {
-        margin-left: 60px;
-    }
-
-    .main-content.expanded {
-        margin-left: 0;
-    }
-}
