@@ -61,14 +61,21 @@ CREATE OR REPLACE FUNCTION archive_old_reservations()
     RETURNS TRIGGER AS
 $$
 BEGIN
+    -- Archive the current row if it's in the past
     IF NEW.date < CURRENT_DATE THEN
-        UPDATE RoomReservations
-        SET action = 'archived'
-        WHERE reservation_id = NEW.reservation_id;
+        NEW.action := 'archived';
     END IF;
-    RETURN NULL;
+
+    -- Ensure all older reservations are archived
+    UPDATE RoomReservations
+    SET action = 'archived'
+    WHERE date < CURRENT_DATE
+      AND action = 'active';
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- This function enforces that no null/empty fields are inserted
 -- and that the due_date is >= current_date.

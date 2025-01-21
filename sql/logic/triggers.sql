@@ -10,7 +10,6 @@ CREATE TRIGGER auto_archive_old_reservations
     AFTER INSERT OR UPDATE
     ON RoomReservations
     FOR EACH ROW
-    WHEN (NEW.date < CURRENT_DATE) -- Runs only for past reservations
 EXECUTE FUNCTION archive_old_reservations();
 
 DROP TRIGGER IF EXISTS tasks_validation_trigger ON Tasks;
