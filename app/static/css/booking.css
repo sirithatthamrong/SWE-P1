@@ -369,15 +369,3 @@ body {
 .close-btn:hover {
     background-color: #0056b3;
 }
-
-/* --- Responsive Design --- */
-@media (max-width: 768px) {
-    .booking-table th, .booking-table td {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .modal-content {
-        width: 80%;
-    }
-}
