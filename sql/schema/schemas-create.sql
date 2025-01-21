@@ -1,6 +1,6 @@
 CREATE TYPE user_role AS ENUM ('admin', 'technician', 'user', 'researcher');
 CREATE TYPE equipment_status AS ENUM ('available', 'needs maintenance');
-CREATE TYPE reservation_action AS ENUM ('created', 'canceled');
+CREATE TYPE reservation_action AS ENUM ('active', 'canceled', 'archived');
 CREATE TYPE inventory_action AS ENUM ('restocked', 'expired');
 CREATE TYPE maintenance_status AS ENUM ('scheduled', 'completed', 'overdue');
 CREATE TYPE task_required_role AS ENUM ( 'admin', 'technician','user', 'researcher');
@@ -77,22 +77,12 @@ CREATE TABLE RoomReservations
     date           DATE    NOT NULL,
     start_time     TIME    NOT NULL,
     end_time       TIME    NOT NULL,
+    action         reservation_action NOT NULL DEFAULT 'active',
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE,
     FOREIGN KEY (lab_zone_id) REFERENCES LabZones (lab_zone_id) ON DELETE CASCADE,
     FOREIGN KEY (lab_room_id) REFERENCES LabRooms (lab_room_id) ON DELETE CASCADE,
     FOREIGN KEY (experiment_id) REFERENCES ExperimentTypes (experiment_id) ON DELETE CASCADE,
     CHECK (start_time < end_time)
-);
-
-CREATE TABLE RoomReservationLogs
-(
-    log_id         SERIAL PRIMARY KEY,
-    reservation_id INTEGER            NOT NULL,
-    performed_by   INTEGER            NOT NULL,
-    action_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    action         reservation_action NOT NULL DEFAULT 'created',
-    FOREIGN KEY (reservation_id) REFERENCES RoomReservations (reservation_id) ON DELETE CASCADE,
-    FOREIGN KEY (performed_by) REFERENCES Users (user_id)
 );
 
 CREATE TABLE Suppliers

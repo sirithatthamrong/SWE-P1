@@ -136,12 +136,6 @@ def create_room_booking(user_id, room_id, experiment_id, date, selected_slots):
         })
         reservation_id = result.fetchone()[0]
 
-        log_query = text("""
-            INSERT INTO RoomReservationLogs (reservation_id, performed_by, action)
-            VALUES (:reservation_id, :user_id, 'created')
-        """)
-        db.session.execute(log_query, {"reservation_id": reservation_id, "user_id": user_id})
-
         db.session.commit()
         return reservation_id
 
@@ -164,7 +158,6 @@ def get_upcoming_bookings(user_id):
 
 
 def cancel_room_booking(reservation_id, user_id):
-    """Cancel a room booking and log the action."""
     try:
         check_query = text("""
             SELECT user_id FROM RoomReservations WHERE reservation_id = :reservation_id
@@ -172,23 +165,19 @@ def cancel_room_booking(reservation_id, user_id):
         result = db.session.execute(check_query, {"reservation_id": reservation_id}).fetchone()
 
         if result is None or result.user_id != user_id:
-            return False  # Unauthorized cancelation attempt
+            return False
 
-        # Move the reservation to a log table (optional for tracking)
-        # log_query = text("""
-        #     INSERT INTO RoomReservationLogs (reservation_id, performed_by, action)
-        #     VALUES (:reservation_id, :user_id, CAST('canceled' AS reservation_action))
-        # """)
-        # db.session.execute(log_query, {"reservation_id": reservation_id, "user_id": user_id})
-
-        # Delete the reservation
-        delete_query = text("DELETE FROM RoomReservations WHERE reservation_id = :reservation_id")
-        db.session.execute(delete_query, {"reservation_id": reservation_id})
+        update_query = text("""
+            UPDATE RoomReservations
+            SET action = 'canceled'
+            WHERE reservation_id = :reservation_id
+        """)
+        db.session.execute(update_query, {"reservation_id": reservation_id})
 
         db.session.commit()
         return True
 
     except Exception as e:
         db.session.rollback()
-        print(f"Cancelation Error: {e}")
+        print(f"Cancellation Error: {e}")
         return False
