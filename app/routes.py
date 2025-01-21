@@ -241,11 +241,11 @@ def book_room(room_id):
         if not selected_slots:
             return jsonify({"error": "Please select at least one time slot."}), 400
 
-        if has_overlapping_booking(user_id, date, selected_slots):
-            return jsonify({"error": "You already have a conflicting booking for this time slot in another room."}), 400
-
         if is_room_already_booked(room_id, date, selected_slots):
             return jsonify({"error": "One or more selected slots are already booked."}), 400
+
+        if has_overlapping_booking(user_id, date, selected_slots):
+            return jsonify({"error": "You already have a conflicting booking for this time slot in another room."}), 400
 
         reservation_id = create_room_booking(user_id, room_id, experiment_id, date, selected_slots)
         if reservation_id:
