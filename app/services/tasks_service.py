@@ -96,6 +96,11 @@ def create_task(data, creator_id):
         if missing:
             return {"error": f"Missing required field(s): {', '.join(missing)}"}, 400
 
+        # Validate due date
+        due_date = datetime.strptime(data["due_date"], "%Y-%m-%d")
+        if due_date.date() < datetime.now().date():  # Ensure date comparison ignores time
+            return {"error": "Due date cannot be in the past."}, 400
+
         # Insert into Tasks first
         insert_task = text("""
             INSERT INTO Tasks (
@@ -129,9 +134,10 @@ def create_task(data, creator_id):
             "priority": data.get("priority", "medium"),
             "creator_id": creator_id
         })
-        new_task_id = result.fetchone()[0]  # get the newly inserted task_id
 
-        # Now parse assigned_to for multiple user IDs: "1;2;3"
+        new_task_id = result.fetchone()[0]  # Get the newly inserted task_id
+
+        # Parse "assigned_to" for multiple user IDs (e.g., "1;2;3")
         assigned_str = data["assigned_to"]
         user_ids = [uid.strip() for uid in assigned_str.split(';') if uid.strip()]
 
