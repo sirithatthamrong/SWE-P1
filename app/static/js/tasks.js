@@ -24,7 +24,6 @@ function showTaskModal(taskId) {
     const taskDueDate = taskCard.dataset.dueDate;
     const taskPriority = taskCard.dataset.priority;
     const taskStatus = taskCard.dataset.status;
-    // "true" or "false"
     const isOwned = (taskCard.dataset.owned === 'true');
 
     // Fill modal info
@@ -33,35 +32,56 @@ function showTaskModal(taskId) {
     document.getElementById('modal-task-due-date').textContent = taskDueDate;
     document.getElementById('modal-task-priority').textContent = taskPriority;
 
-    // Accept/Complete forms
+    // Accept/Complete/Delete forms
     const acceptForm = document.getElementById('acceptForm');
     const completeForm = document.getElementById('completeForm');
     const deleteForm = document.getElementById('deleteForm');
 
-    // Hide them by default
+    // Hide all forms by default
     acceptForm.style.display = 'none';
     completeForm.style.display = 'none';
     deleteForm.style.display = 'none';
 
-    // If status == 'pending', show accept form
+    // Decide which tab param we want after each action:
+    // 'my-tasks' if it's pending, 'in-progress' if it's in progress, etc.
+    let afterAcceptTab = 'in-progress';   // e.g. user might want to see in-progress after acceptance
+    let afterCompleteTab = 'completed';   // see completed tab after finishing
+    let afterDeleteTab = 'my-creations';  // or wherever
+
+    // If the task status is 'pending', show the accept form
     if (taskStatus === 'pending') {
         acceptForm.style.display = 'block';
-        acceptForm.action = `/tasks/${taskId}/accept`;
+        // Add ?tab=...
+        acceptForm.action = `/tasks/${taskId}/accept?tab=${afterAcceptTab}`;
     }
-    // If status == 'in progress', show complete form
+    // If the task status is 'in progress', show the complete form
     if (taskStatus === 'in progress') {
         completeForm.style.display = 'block';
-        completeForm.action = `/tasks/${taskId}/complete`;
+        completeForm.action = `/tasks/${taskId}/complete?tab=${afterCompleteTab}`;
     }
-    // If user owns the task, show delete form
+    // If the user owns the task, show the delete form
     if (isOwned) {
         deleteForm.style.display = 'block';
-        deleteForm.action = `/tasks/${taskId}/delete`;
+        deleteForm.action = `/tasks/${taskId}/delete?tab=${afterDeleteTab}`;
     }
 
+    // Display the modal
     modal.style.display = 'block';
 }
 
 function closeTaskModal() {
     document.getElementById('task-modal').style.display = 'none';
 }
+
+// On DOM load, if there's an 'active_tab' from the server, open that tab:
+document.addEventListener('DOMContentLoaded', () => {
+    // The server passes "active_tab" into tasks.html (see next snippet).
+    const currentTab = document.querySelector('body').getAttribute('data-active-tab');
+    if (currentTab) {
+        // simulate a click on the corresponding button
+        const btn = document.querySelector(`.tab-button[onclick*="${currentTab}"]`);
+        if (btn) {
+            btn.click();
+        }
+    }
+});
