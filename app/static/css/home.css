@@ -1,8 +1,8 @@
 body {
-    margin: 0;
     font-family: 'Poppins', sans-serif;
-    display: flex;
-    height: 100vh;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
 /* Sidebar */
@@ -80,8 +80,6 @@ body {
     cursor: pointer;
     outline: none;
     padding: 10px;
-    display: flex;
-    align-items: center;
     justify-content: center;
 }
 
