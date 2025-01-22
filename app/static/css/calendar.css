@@ -5,20 +5,67 @@ body {
     padding: 0;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+/* Calendar Container */
+.calendar-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.list-group-item {
+/* Header */
+.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
 }
 
-#calendar {
-    margin-top: 20px;
-    border: 1px solid #ddd;
+.calendar-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Task Breakdown */
+.task-breakdown {
+    display: flex;
+    gap: 10px;
+}
+
+.task-breakdown span {
+    padding: 8px 12px;
     border-radius: 5px;
-    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.high-priority {
+    background-color: red;
+    color: white;
+}
+
+.medium-priority {
+    background-color: orange;
+    color: black;
+}
+
+.low-priority {
+    background-color: green;
+    color: white;
+}
+
+/* FullCalendar Styles */
+#calendar {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Custom event colors */
+.fc-event {
+    border-radius: 5px;
+    padding: 5px;
 }

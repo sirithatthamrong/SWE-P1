@@ -115,19 +115,19 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION complete_task(p_task_id INTEGER, p_user_id INTEGER)
-RETURNS BOOLEAN AS $$
+    RETURNS BOOLEAN AS
+$$
 BEGIN
     UPDATE Tasks
-    SET status = 'completed',
+    SET status       = 'completed',
         completed_at = CURRENT_TIMESTAMP,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at   = CURRENT_TIMESTAMP
     WHERE task_id = p_task_id
       AND status = 'in progress'
-      AND EXISTS (
-          SELECT 1 FROM TaskAssignments
-          WHERE task_id = p_task_id
-            AND user_id = p_user_id
-      );
+      AND EXISTS (SELECT 1
+                  FROM TaskAssignments
+                  WHERE task_id = p_task_id
+                    AND user_id = p_user_id);
 
     IF FOUND THEN
         RETURN TRUE;
