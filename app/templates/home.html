@@ -2,6 +2,12 @@
 
 
 {% block content %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}LabSync{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    </head>
     <h2>Welcome, Ajarn Piti Ongmongkolkul :)</h2>
     <div class="welcome-container">
         <img src="{{ url_for('static', filename='images/piti.png') }}" alt="User" class="user-image">

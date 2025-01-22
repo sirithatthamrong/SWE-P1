@@ -20,18 +20,19 @@ from app.services.tasks_service import (
     complete_task
 )
 from app.services.booking_service import (
-    get_lab_zones, 
-    get_experiment_types, 
-    get_all_rooms, 
+    get_lab_zones,
+    get_experiment_types,
+    get_all_rooms,
     get_available_rooms,
-    get_room_details, 
-    get_available_time_slots, 
-    create_room_booking, 
-    has_overlapping_booking, 
+    get_room_details,
+    get_available_time_slots,
+    create_room_booking,
+    has_overlapping_booking,
     is_room_already_booked,
     cancel_room_booking,
     get_upcoming_bookings
 )
+from app.services.calendar_service import fetch_calendar_data
 
 main = Blueprint('main', __name__)
 
@@ -208,6 +209,8 @@ def delete_task_route(task_id):
 @main.route('/booking', methods=['GET', 'POST'])
 @login_required
 def booking():
+    today = datetime.now().strftime('%Y-%m-%d')
+
     if request.method == 'POST':
         lab_zone_id = request.form.get('lab_zone')
         experiment_id = request.form.get('experiment_type')
@@ -228,7 +231,8 @@ def booking():
         lab_zones=get_lab_zones(),
         experiment_types=get_experiment_types(),
         all_rooms=get_all_rooms(),
-        future_bookings=upcoming_bookings
+        future_bookings=upcoming_bookings,
+        today=today
     )
 
 
@@ -242,7 +246,7 @@ def cancel_booking(reservation_id):
     else:
         return jsonify({"error": "Failed to cancel booking or unauthorized action."}), 400
 
-  
+
 @main.route('/booking/room/<int:room_id>', methods=['GET', 'POST'])
 @login_required
 def book_room(room_id):
@@ -290,8 +294,17 @@ def book_room(room_id):
 # -------------------------------------------------------------------
 #                      My Calendar Page
 # -------------------------------------------------------------------
-@main.route('/calendar', methods=['GET', 'POST'])
+@main.route('/calendar', methods=['GET'])
 @login_required
 def calendar():
-    return render_template('calendar.html')
+    user_id = session.get('user_id')
 
+    calendar_data = fetch_calendar_data(user_id)
+
+    return render_template(
+        'calendar.html',
+        reservations=calendar_data["reservations"],
+        upcoming_reservations=calendar_data["upcoming_reservations"],
+        tasks=calendar_data["tasks"],
+        task_counts=calendar_data["task_counts"],
+    )

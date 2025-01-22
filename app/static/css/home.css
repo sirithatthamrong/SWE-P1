@@ -1,13 +1,13 @@
 body {
-    margin: 0;
     font-family: 'Poppins', sans-serif;
-    display: flex;
-    height: 100vh;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 140px;
+    width: 150px;
     background: #e7eff9;
     display: flex;
     flex-direction: column;
@@ -23,7 +23,7 @@ body {
 
 /* Sidebar Collapsed */
 .sidebar.hidden {
-    width: 50px; /* Icons remain visible */
+    width: 70px; /* Icons remain visible */
 }
 
 /* Sidebar Navigation */
@@ -37,6 +37,7 @@ body {
 /* Sidebar Items */
 .sidebar .nav li {
     margin: 10px 0;
+    width: 100%;
 }
 
 /* Sidebar Links */
@@ -79,8 +80,6 @@ body {
     cursor: pointer;
     outline: none;
     padding: 10px;
-    display: flex;
-    align-items: center;
     justify-content: center;
 }
 

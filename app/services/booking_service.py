@@ -157,7 +157,7 @@ def get_upcoming_bookings(user_id):
         FROM RoomReservations rr
         JOIN LabRooms lr ON rr.lab_room_id = lr.lab_room_id
         WHERE rr.user_id = :user_id 
-            AND rr.date >= CURRENT_DATE
+            AND rr.date > CURRENT_DATE
             AND rr.action = 'active'
         ORDER BY rr.date, rr.start_time;
     """)
