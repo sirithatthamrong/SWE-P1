@@ -11,7 +11,6 @@ from flask import (
 from sqlalchemy import text
 from app import db
 from datetime import datetime
-import pytz
 from app.services.auth_service import signup_user, login_user, login_required
 from app.services.tasks_service import (
     get_tasks_for_user,
@@ -33,6 +32,7 @@ from app.services.booking_service import (
     cancel_room_booking,
     get_upcoming_bookings
 )
+from app.services.calendar_service import fetch_calendar_data
 
 main = Blueprint('main', __name__)
 
@@ -276,4 +276,14 @@ def book_room(room_id):
 @main.route('/calendar', methods=['GET'])
 @login_required
 def calendar():
-    return render_template('calendar.html')
+    user_id = session.get('user_id')
+
+    calendar_data = fetch_calendar_data(user_id)
+
+    return render_template(
+        'calendar.html',
+        reservations=calendar_data["reservations"],
+        upcoming_reservations=calendar_data["upcoming_reservations"],
+        tasks=calendar_data["tasks"],
+        task_counts=calendar_data["task_counts"],
+    )
