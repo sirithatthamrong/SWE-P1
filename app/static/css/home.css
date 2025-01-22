@@ -7,7 +7,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 140px;
+    width: 150px;
     background: #e7eff9;
     display: flex;
     flex-direction: column;
@@ -23,7 +23,7 @@ body {
 
 /* Sidebar Collapsed */
 .sidebar.hidden {
-    width: 50px; /* Icons remain visible */
+    width: 70px; /* Icons remain visible */
 }
 
 /* Sidebar Navigation */
@@ -37,6 +37,7 @@ body {
 /* Sidebar Items */
 .sidebar .nav li {
     margin: 10px 0;
+    width: 100%;
 }
 
 /* Sidebar Links */
