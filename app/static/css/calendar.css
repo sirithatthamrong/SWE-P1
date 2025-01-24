@@ -10,7 +10,7 @@ body {
     margin: 20px auto;
     padding: 20px;
     border-radius: 10px;
-    background: #e0f8fa;
+    background: #eef3f7;
 }
 
 /* Header */
@@ -46,18 +46,18 @@ body {
 }
 
 .high-priority {
-    background-color: #fa8b95;
-    color: black;
+    background-color: #dc3545;
+    color: white;
 }
 
 .medium-priority {
-    background-color: #efc74f;
-    color: black;
+    background-color: #ffc107;
+    color: white;
 }
 
 .low-priority {
-    background-color: #6cd885;
-    color: black;
+    background-color: #28a745;
+    color: white;
 }
 
 /* FullCalendar Customization */
@@ -65,7 +65,7 @@ body {
     width: 100%;
     border-radius: 10px;
     overflow: hidden;
-    background: #eef3f7;
+    background: #fff;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -74,7 +74,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #eef3f7;
+    background: #fff;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
@@ -89,7 +89,7 @@ body {
 }
 
 .fc-dom-1 {
-    background: #eef3f7;
+    background: #fff;
 }
 
 /* Custom Event Colors */
@@ -107,7 +107,7 @@ body {
     white-space: nowrap;
     overflow: visible !important;
     text-overflow: clip;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-weight: bold;
 }
 
@@ -116,7 +116,7 @@ body {
     white-space: nowrap;
     overflow: hidden !important;
     text-overflow: ellipsis;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-weight: bold;
 }
 
