@@ -1,24 +1,206 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
     margin: 0;
     padding: 0;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+/* Calendar Container */
+.calendar-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background: #eef3f7;
 }
 
-.list-group-item {
+/* Header */
+.calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
+    padding: 20px;
+    border-radius: 10px;
 }
 
-#calendar {
-    margin-top: 20px;
-    border: 1px solid #ddd;
+.calendar-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Task Breakdown */
+.task-breakdown {
+    display: flex;
+    gap: 10px;
+}
+
+.task-breakdown span {
+    padding: 8px 12px;
     border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.high-priority {
+    background-color: #dc3545;
+    color: white;
+}
+
+.medium-priority {
+    background-color: #ffc107;
+    color: white;
+}
+
+.low-priority {
+    background-color: #28a745;
+    color: white;
+}
+
+/* FullCalendar Customization */
+#calendar {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* FullCalendar Toolbar */
+.fc-header-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
     padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.fc-toolbar-title {
+    font-size: 22px !important;
+    font-weight: bold !important;
+    color: #2c3e50 !important;
+    font-family: 'Poppins', sans-serif !important; /* Ensures same font */
+}
+
+.fc-dom-1 {
+    background: #fff;
+}
+
+/* Custom Event Colors */
+.fc-event {
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: visible; /* Ensures text does not overflow */
+    text-overflow: clip;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+/* Hide event time text */
+.fc-event-time {
+    white-space: nowrap;
+    overflow: visible !important;
+    text-overflow: clip;
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+/* Ensure full room name is displayed */
+.fc-event-title {
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    font-size: 12px !important;
+    font-weight: bold;
+}
+
+
+/* Improve event appearance */
+.fc-daygrid-event {
+    min-height: 30px !important;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Event Colors */
+.fc-daygrid-event-dot {
+    display: none; /* Remove the default dot styling */
+}
+
+.fc-day-today {
+    background: rgba(0, 123, 255, 0.1) !important;
+    border: 1px solid #74a9e3;
+}
+
+.fc-daygrid-day-number {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+/* --- Navigation Buttons (<, >, today) --- */
+.fc-toolbar-chunk button {
+    background: #74a9e3 !important;
+    color: white !important;
+    border: none !important;
+    padding: 5px 10px !important;
+    font-size: 14px !important;
+    border-radius: 5px;
+}
+
+.fc-toolbar-chunk button:hover {
+    background: #0056b3 !important;
+}
+
+/* --- View Buttons (Month, Week) --- */
+.fc-button-group .fc-button {
+    background: #74a9e3 !important;
+    color: white !important;
+    border: none !important;
+    padding: 5px 10px !important;
+    font-size: 14px !important;
+    border-radius: 5px;
+}
+
+.fc-button-group .fc-button:hover {
+    background: #0056b3 !important;
+}
+
+.fc-button-primary {
+    background: #74a9e3 !important;
+}
+
+/* Improve Today Button */
+.fc-button.fc-today-button {
+    background: #28a745 !important;
+}
+
+.fc-button.fc-today-button:hover {
+    background: #1e7e34 !important;
+}
+
+.fc-popover {
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.fc-event:hover {
+    opacity: 0.85;
+    cursor: pointer;
+}
+
+/* --- Reduce Calendar Size --- */
+.fc-daygrid-day {
+    min-height: 50px !important;
 }

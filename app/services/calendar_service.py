@@ -9,8 +9,8 @@ def fetch_calendar_data(user_id):
         SELECT 
             R.reservation_id, 
             R.date, 
-            R.start_time, 
-            R.end_time, 
+            R.start_time,
+            R.end_time,
             R.action AS status, 
             L.lab_zone_id, 
             L.name AS room_name
