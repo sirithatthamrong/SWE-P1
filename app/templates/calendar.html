@@ -1,38 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Calendar</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>My Calendar</title>
 
-    <!-- FullCalendar CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
-</head>
+        <!-- FullCalendar CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+    </head>
 
-<div class="calendar-container">
-    <div class="calendar-header">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h2>My Calendar</h2>
 
-        <h2>📅 Monthly Calendar</h2>
-
-        <div class="task-breakdown">
-            <span class="high-priority">High: {{ task_counts['high'] }}</span>
-            <span class="medium-priority">Medium: {{ task_counts['medium'] }}</span>
-            <span class="low-priority">Low: {{ task_counts['low'] }}</span>
+            <div class="task-breakdown">
+                <span class="high-priority">🔥 High: {{ task_counts['high'] }}</span>
+                <span class="medium-priority">⚠️ Medium: {{ task_counts['medium'] }}</span>
+                <span class="low-priority">✅ Low: {{ task_counts['low'] }}</span>
+            </div>
         </div>
+
+        <div id="calendar"></div>
     </div>
 
-    <div id="calendar"></div>
-</div>
+    <!-- Pass reservations and tasks data to JavaScript -->
+    <script>
+        const reservations = {{ reservations | tojson }};
+        const tasks = {{ tasks | tojson }};
+    </script>
 
-<!-- Pass reservations and tasks data to JavaScript -->
-<script>
-    const reservations = {{ reservations | tojson }};
-    const tasks = {{ tasks | tojson }};
-</script>
-
-<!-- FullCalendar JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<!-- Load calendar.js after FullCalendar -->
-<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Load calendar.js after FullCalendar -->
+    <script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
 {% endblock %}
