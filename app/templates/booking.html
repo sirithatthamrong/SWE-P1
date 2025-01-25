@@ -15,25 +15,29 @@
             <form id="booking-form">
                 <div class="form-group">
                     <label for="lab_zone">Lab Zone:</label>
-                    <select id="lab_zone" name="lab_zone">
-                        <option value="">Select Lab Zone</option>
-                        {% for zone in lab_zones %}
-                            <option value="{{ zone.lab_zone_id }}">{{ zone.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="select-container">
+                        <select id="lab_zone" name="lab_zone">
+                            <option value="">Select Lab Zone</option>
+                            {% for zone in lab_zones %}
+                                <option value="{{ zone.lab_zone_id }}">{{ zone.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="experiment_type">Experiment Type:</label>
-                    <select id="experiment_type" name="experiment_type">
-                        <option value="">Select Experiment Type</option>
-                        {% for exp in experiment_types %}
-                            <option value="{{ exp.experiment_id }}">{{ exp.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="select-container">
+                        <select id="experiment_type" name="experiment_type">
+                            <option value="">Select Experiment Type</option>
+                            {% for exp in experiment_types %}
+                                <option value="{{ exp.experiment_id }}">{{ exp.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
-{#                <p>Debug: Today is {{ today }}</p>#}
+                {#                <p>Debug: Today is {{ today }}</p>#}
 
                 <div class="form-group">
                     <label for="date">Date:</label>
