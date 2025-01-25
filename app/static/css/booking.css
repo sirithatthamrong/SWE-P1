@@ -369,3 +369,41 @@ body {
 .close-btn:hover {
     background-color: #0056b3;
 }
+
+/* Custom Select Styling */
+.select-container {
+    position: relative;
+    width: 100%;
+}
+
+/* Ensure text is not cut */
+.select-container select {
+    width: 100%;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+    appearance: none; /* Removes default browser dropdown */
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.5; /* Ensures text is vertically aligned */
+    text-indent: 0px; /* Fixes text getting shifted */
+}
+
+/* Custom dropdown arrow */
+.select-container::after {
+    content: "▼";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #888;
+    pointer-events: none;
+}
+
+/* Fix text overflow inside select */
+.select-container select option {
+    padding: 10px;
+    white-space: normal; /* Allows text to wrap */
+}
