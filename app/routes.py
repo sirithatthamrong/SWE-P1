@@ -74,7 +74,9 @@ def signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        if signup_user(username, email, password):
+        role = request.form.get('role', 'user')  # Default to 'user' if none selected
+
+        if signup_user(username, email, password, role):
             return redirect(url_for('main.login'))
     return render_template('signup.html')
 

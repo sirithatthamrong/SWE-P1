@@ -196,3 +196,47 @@ form input:focus {
     }
 }
 
+/* Style the select box to match the input fields */
+select {
+    margin-bottom: 15px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: white;
+    font-family: 'Poppins', sans-serif;
+    appearance: none; /* Remove default browser styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Style the select box to match input fields */
+.select-container {
+    position: relative;
+    width: 100%;
+}
+
+.select-container select {
+    width: 100%;
+    padding: 12px;
+    padding-right: 40px; /* Space for the dropdown arrow */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: white;
+    font-family: 'Poppins', sans-serif;
+    appearance: none; /* Remove default browser styling */
+    cursor: pointer;
+}
+
+/* Custom dropdown arrow */
+.select-container::after {
+    content: "▼";
+    position: absolute;
+    top: 40%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #888;
+    pointer-events: none;
+}

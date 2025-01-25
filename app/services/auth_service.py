@@ -17,7 +17,7 @@ def login_required(f):
     return decorated_function
 
 
-def signup_user(username, email, password):
+def signup_user(username, email, password, role):
     query = text("SELECT username FROM Users WHERE username = :username")
     result = db.session.execute(query, {'username': username}).fetchone()
 
@@ -27,13 +27,14 @@ def signup_user(username, email, password):
 
     try:
         query = text(
-            "INSERT INTO Users (username, email, password) VALUES (:username, :email, :password)"
+            "INSERT INTO Users (username, email, password, role) VALUES (:username, :email, :password, :role)"
         )
-        db.session.execute(query, {'username': username, 'email': email, 'password': password})
+        db.session.execute(query, {'username': username, 'email': email, 'password': password, 'role': role})
         db.session.commit()
         flash("Signup successful! Please log in.", "success")
         return True
     except Exception as e:
+        db.session.rollback()
         flash(f"Signup failed: {str(e)}", "danger")
         return False
 
