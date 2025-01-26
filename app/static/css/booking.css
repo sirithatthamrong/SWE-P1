@@ -10,7 +10,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: stretch; /* Ensures equal height */
-    max-width: 90%;
+    max-width: 100%;
     margin: 20px auto;
     padding: 20px;
     background: #eef3f7;
@@ -234,7 +234,7 @@ body {
 
 /* --- Recent Activities --- */
 .recent-bookings-container {
-    width: 90%;
+    width: 100%;
     margin: 20px auto;
     padding: 20px;
     background: #eef3f7;

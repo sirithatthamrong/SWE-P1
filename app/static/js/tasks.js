@@ -1,5 +1,3 @@
-// tasks.js
-
 function openTab(event, tabName) {
     const tabContents = document.querySelectorAll('.tab-content');
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -85,3 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+function completeTask(event, taskId) {
+    event.stopPropagation(); // Prevents modal from opening when clicking the button
+    fetch(`/tasks/${taskId}/complete`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"}
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Task marked as completed!");
+                location.reload();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error completing task:", error));
+}
