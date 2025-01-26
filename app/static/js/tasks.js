@@ -113,7 +113,7 @@ function applyFilters() {
     let selectedDueDate = document.getElementById("filter-due-date").value;
 
     document.querySelectorAll(".task-card").forEach(card => {
-        let taskType = card.getAttribute("data-task-type");
+        let taskType = card.getAttribute("data-task-type").trim();
         let priority = card.getAttribute("data-priority");
         let dueDate = card.getAttribute("data-due-date");
 

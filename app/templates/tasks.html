@@ -12,17 +12,22 @@
     <div class="overdue-tasks-section">
         <h2>Overdue Tasks</h2>
         <div class="overdue-tasks">
-            {% for task in tasks if task.status == 'overdue' %}
-                <div class="overdue-task-card">
-                    <div class="task-header">{{ task.task_name }}</div>
-                    <p><strong>Due Date:</strong> {{ task.due_date }}</p>
-                    <div class="task-actions">
-                        <button class="complete-task-btn" onclick="completeTask(event, {{ task.task_id }})">
-                            Complete
-                        </button>
+            {% set overdue_tasks = tasks | selectattr("status", "equalto", "overdue") | list %}
+            {% if overdue_tasks %}
+                {% for task in overdue_tasks %}
+                    <div class="overdue-task-card">
+                        <div class="task-header">{{ task.task_name }}</div>
+                        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                        <div class="task-actions">
+                            <button class="complete-task-btn" onclick="completeTask(event, {{ task.task_id }})">
+                                Complete
+                            </button>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p class="no-overdue-tasks">No overdue tasks found!</p>
+            {% endif %}
         </div>
     </div>
 
@@ -34,7 +39,7 @@
                 <label>Task Type:</label>
                 {% for ttype in task_types %}
                     <div>
-                        <input type="checkbox" class="filter-task-type" value="{{ ttype.id }}">
+                        <input type="checkbox" class="filter-task-type" value="{{ ttype.name }}">
                         <label>{{ ttype.name }}</label>
                     </div>
                 {% endfor %}
@@ -77,6 +82,7 @@
                                      data-task-name="{{ task.task_name|escape }}"
                                      data-task-desc="{{ task.task_description|escape }}"
                                      data-due-date="{{ task.due_date }}"
+                                      data-task-type="{{ task.task_type|escape }}"
                                      data-priority="{{ task.priority }}"
                                      data-status="{{ task.status }}"
                                      data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
@@ -99,6 +105,7 @@
                                      data-task-name="{{ task.task_name|escape }}"
                                      data-task-desc="{{ task.task_description|escape }}"
                                      data-due-date="{{ task.due_date }}"
+                                      data-task-type="{{ task.task_type|escape }}"
                                      data-priority="{{ task.priority }}"
                                      data-status="{{ task.status }}"
                                      data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
@@ -122,11 +129,11 @@
                              data-task-name="{{ task.task_name|escape }}"
                              data-task-desc="{{ task.task_description|escape }}"
                              data-due-date="{{ task.due_date }}"
+                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
                              data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}">
                             <h3>{{ task.task_name }}</h3>
-{#                            <p><strong>Description:</strong> {{ task.task_description }}</p>#}
                             <p><strong>Due Date:</strong> {{ task.due_date }}</p>
                             <p><strong>Status:</strong> {{ task.status }}</p>
                         </div>
@@ -143,6 +150,7 @@
                              data-task-name="{{ task.task_name|escape }}"
                              data-task-desc="{{ task.task_description|escape }}"
                              data-due-date="{{ task.due_date }}"
+                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
                              data-owned="true"
@@ -150,7 +158,7 @@
                         >
                             <h3>{{ task.task_name }}</h3>
                             <p><strong>Priority:</strong> {{ task.priority }}</p>
-{#                            <p><strong>Description:</strong> {{ task.task_description }}</p>#}
+                            {#                            <p><strong>Description:</strong> {{ task.task_description }}</p>#}
                             <p><strong>Due Date:</strong> {{ task.due_date }}</p>
                             <p><strong>Status:</strong> {{ task.status }}</p>
                         </div>
