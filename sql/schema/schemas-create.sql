@@ -180,7 +180,7 @@ CREATE TABLE Tasks
     task_id          SERIAL PRIMARY KEY,
     task_name        VARCHAR(100) NOT NULL,
     task_description TEXT         NOT NULL,
-    due_date         DATE         NOT NULL CHECK ( due_date >= CURRENT_DATE ),
+    due_date         DATE         NOT NULL,
     task_type_id     INTEGER      NOT NULL,
     created_at       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,

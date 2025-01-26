@@ -7,14 +7,14 @@ EXECUTE FUNCTION prevent_double_booking();
 
 DROP TRIGGER IF EXISTS auto_archive_old_reservations ON RoomReservations;
 CREATE TRIGGER auto_archive_old_reservations
-    AFTER INSERT OR UPDATE
+    BEFORE INSERT OR UPDATE
     ON RoomReservations
     FOR EACH ROW
 EXECUTE FUNCTION archive_old_reservations();
 
-DROP TRIGGER IF EXISTS tasks_validation_trigger ON Tasks;
-CREATE TRIGGER tasks_validation_trigger
+DROP TRIGGER IF EXISTS trigger_update_overdue_tasks ON Tasks;
+CREATE TRIGGER trigger_update_overdue_tasks
     BEFORE INSERT OR UPDATE
     ON Tasks
     FOR EACH ROW
-EXECUTE FUNCTION tasks_validation();
+EXECUTE FUNCTION update_overdue_tasks();

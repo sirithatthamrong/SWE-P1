@@ -1,5 +1,3 @@
-# app/services/tasks_service.py
-
 from datetime import datetime
 from sqlalchemy import text
 from app import db

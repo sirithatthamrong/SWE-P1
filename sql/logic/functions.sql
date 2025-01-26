@@ -76,22 +76,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
--- This function enforces that no null/empty fields are inserted
--- and that the due_date is >= current_date.
-CREATE OR REPLACE FUNCTION tasks_validation()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    -- Check due_date is in the future (or today)
-    IF NEW.due_date < CURRENT_DATE THEN
-        RAISE EXCEPTION 'Due date cannot be in the past.';
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION accept_task(p_task_id INTEGER, p_user_id INTEGER)
     RETURNS BOOLEAN AS
 $$
@@ -134,5 +118,16 @@ BEGIN
     ELSE
         RETURN FALSE;
     END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_overdue_tasks()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NEW.status IN ('pending', 'in progress') AND NEW.due_date < CURRENT_DATE THEN
+        NEW.status := 'overdue';
+    END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
