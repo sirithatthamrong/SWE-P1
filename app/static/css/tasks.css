@@ -10,6 +10,13 @@ body {
     margin: 20px;
 }
 
+.overdue-tasks-section h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
 .overdue-tasks {
     display: flex;
     flex-wrap: wrap;

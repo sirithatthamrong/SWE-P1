@@ -142,19 +142,19 @@
             <h3>Create a New Task</h3>
             <form action="{{ url_for('main.tasks_page') }}" method="POST">
                 <label>Task Name:
-                    <input type="text" name="task_name">
+                    <input type="text" name="task_name" id="task_name" required>
                 </label><br><br>
 
                 <label>Task Description:
-                    <textarea name="task_description"></textarea>
+                    <textarea name="task_description" id="task_description" required></textarea>
                 </label><br><br>
 
                 <label>Due Date:
-                    <input type="date" name="due_date">
+                    <input type="date" name="due_date" id="due_date" required>
                 </label><br><br>
 
                 <label>Task Type:
-                    <select name="task_type_id">
+                    <select name="task_type_id" id="task_type_id">
                         {% for ttype in task_types %}
                             <option value="{{ ttype.id }}">{{ ttype.name }}</option>
                         {% endfor %}
@@ -162,11 +162,11 @@
                 </label><br><br>
 
                 <label>Assigned To (User IDs, semicolon separated):
-                    <input type="text" name="assigned_to" placeholder="e.g. 1;2;3">
+                    <input type="text" name="assigned_to" id="assigned_to" placeholder="e.g. 1;2;3" required>
                 </label><br><br>
 
                 <label>Priority:
-                    <select name="priority">
+                    <select name="priority" id="priority">
                         <option value="low">Low</option>
                         <option value="medium" selected>Medium</option>
                         <option value="high">High</option>

@@ -101,3 +101,8 @@ function completeTask(event, taskId) {
         })
         .catch(error => console.error("Error completing task:", error));
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date().toISOString().split("T")[0];
+    document.getElementById("due_date").setAttribute("min", today); // Set min attribute
+});
