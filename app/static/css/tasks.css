@@ -83,7 +83,7 @@ body {
 }
 
 .filters h3 {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 15px;
@@ -249,23 +249,34 @@ body {
 
 /* Filters should be positioned on the left */
 .filters {
-    width: 300px;  /* Fixed width */
-    /*background: white;*/
-    padding: 15px;
+    width: 320px;
+    padding: 20px;
     border-radius: 10px;
-    /*box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);*/
     position: sticky;
     top: 20px;
-    height: fit-content; /* Prevent stretching */
+    height: fit-content;
 }
 
 .filter-section {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     width: 300px;
 }
 
+/* Improve spacing and alignment for checkboxes */
+.filter-section label{
+    font-size: 16px;
+    /*font-weight: bold;*/
+    color: #333;
+    cursor: pointer;
+}
+
+.filter-section input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2); /* Slightly enlarge checkboxes */
+}
+
 .filter-btn {
-    padding: 5px;
+    padding: 10px;
     margin-top: 10px;
     background-color: #74a9e3;
     color: white;
@@ -274,7 +285,17 @@ body {
     width: 100%;
     border-radius: 5px;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+}
+
+.filter-section input[type="date"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .filter-btn:hover {
