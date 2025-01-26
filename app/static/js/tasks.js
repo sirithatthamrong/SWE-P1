@@ -104,5 +104,23 @@ function completeTask(event, taskId) {
 
 document.addEventListener("DOMContentLoaded", function () {
     let today = new Date().toISOString().split("T")[0];
-    document.getElementById("due_date").setAttribute("min", today); // Set min attribute
+    document.getElementById("filter-due-date").setAttribute("min", today);
 });
+
+function applyFilters() {
+    let selectedTaskTypes = Array.from(document.querySelectorAll(".filter-task-type:checked")).map(cb => cb.value);
+    let selectedPriorities = Array.from(document.querySelectorAll(".filter-priority:checked")).map(cb => cb.value);
+    let selectedDueDate = document.getElementById("filter-due-date").value;
+
+    document.querySelectorAll(".task-card").forEach(card => {
+        let taskType = card.getAttribute("data-task-type");
+        let priority = card.getAttribute("data-priority");
+        let dueDate = card.getAttribute("data-due-date");
+
+        let show = (!selectedTaskTypes.length || selectedTaskTypes.includes(taskType)) &&
+                   (!selectedPriorities.length || selectedPriorities.includes(priority)) &&
+                   (!selectedDueDate || dueDate < selectedDueDate); // Change filter logic
+
+        card.style.display = show ? "block" : "none";
+    });
+}
