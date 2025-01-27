@@ -1,0 +1,120 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: flex-start;
+    max-width: 100%;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.profile-card {
+    /*max-width: 2000px;*/
+    width: 100%;
+    background: #eef3f7;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.profile-info {
+    max-width: 100%;
+}
+
+.profile-info p {
+    font-size: 16px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.users-container {
+    max-width: 100%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.filter-section {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#role-filter {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #7e71b5;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: none;
+    background: #74a9e3;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.pagination button:hover {
+    background: #0056b3;
+}
+
+.pagination #page-info {
+    font-size: 14px;
+    margin: auto 15px;
+}

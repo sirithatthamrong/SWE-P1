@@ -307,3 +307,26 @@ def calendar():
         tasks=calendar_data["tasks"],
         task_counts=calendar_data["task_counts"],
     )
+
+
+# -------------------------------------------------------------------
+#                      User Profile Page
+# -------------------------------------------------------------------
+@main.route('/profile', methods=['GET'])
+@login_required
+def profile():
+    user_id = session.get('user_id')
+
+    user = db.session.execute(text("SELECT * FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+
+    if not user:
+        flash("User not found", "danger")
+        return redirect(url_for('main.home'))
+
+    users = db.session.execute(text("SELECT * FROM Users")).fetchall()
+
+    # Fetch distinct roles for filtering
+    roles_query = db.session.execute(text("SELECT DISTINCT role FROM Users"))
+    roles = [row.role for row in roles_query]
+
+    return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
