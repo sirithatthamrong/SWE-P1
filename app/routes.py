@@ -131,7 +131,7 @@ def tasks_page():
     )
 
 
-@main.route('/tasks/<int:task_id>/accept', methods=['POST'])
+@main.route('/tasks/<int:task_id>/accept', methods=['POST', 'GET'])
 @login_required
 def accept_task_route(task_id):
     """
@@ -145,7 +145,7 @@ def accept_task_route(task_id):
     if status_code == 200:
         flash("Task accepted!", "success")
     else:
-        flash(response.get("error"), "danger")
+        jsonify({"error": response.get("error")}), 400
 
     return redirect(url_for('main.tasks_page', tab=next_tab))
 
@@ -153,14 +153,11 @@ def accept_task_route(task_id):
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
 @login_required
 def complete_task_route(task_id):
-    """
-    Called when user completes a task in progress.
-    We read ?tab=..., then redirect back with that tab.
-    """
     user_id = session.get('user_id')
-    next_tab = request.args.get('tab', 'in-progress')  # default 'in-progress'
+    next_tab = request.args.get('tab', 'completed')
 
     response, status_code = complete_task(task_id, user_id)
+
     if status_code == 200:
         flash("Task completed!", "success")
     else:
@@ -310,3 +307,26 @@ def calendar():
         tasks=calendar_data["tasks"],
         task_counts=calendar_data["task_counts"],
     )
+
+
+# -------------------------------------------------------------------
+#                      User Profile Page
+# -------------------------------------------------------------------
+@main.route('/profile', methods=['GET'])
+@login_required
+def profile():
+    user_id = session.get('user_id')
+
+    user = db.session.execute(text("SELECT * FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+
+    if not user:
+        flash("User not found", "danger")
+        return redirect(url_for('main.home'))
+
+    users = db.session.execute(text("SELECT * FROM Users")).fetchall()
+
+    # Fetch distinct roles for filtering
+    roles_query = db.session.execute(text("SELECT DISTINCT role FROM Users"))
+    roles = [row.role for row in roles_query]
+
+    return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)

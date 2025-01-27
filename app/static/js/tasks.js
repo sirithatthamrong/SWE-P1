@@ -1,5 +1,3 @@
-// tasks.js
-
 function openTab(event, tabName) {
     const tabContents = document.querySelectorAll('.tab-content');
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -85,3 +83,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+function completeTask(event, taskId) {
+    event.stopPropagation(); // Prevents modal from opening when clicking the button
+    fetch(`/tasks/${taskId}/complete`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"}
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Task marked as completed!");
+                location.reload();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error completing task:", error));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date().toISOString().split("T")[0];
+    document.getElementById("filter-due-date").setAttribute("min", today);
+});
+
+function applyFilters() {
+    let selectedTaskTypes = Array.from(document.querySelectorAll(".filter-task-type:checked")).map(cb => cb.value);
+    let selectedPriorities = Array.from(document.querySelectorAll(".filter-priority:checked")).map(cb => cb.value);
+    let selectedDueDate = document.getElementById("filter-due-date").value;
+
+    document.querySelectorAll(".task-card").forEach(card => {
+        let taskType = card.getAttribute("data-task-type").trim();
+        let priority = card.getAttribute("data-priority");
+        let dueDate = card.getAttribute("data-due-date");
+
+        let show = (!selectedTaskTypes.length || selectedTaskTypes.includes(taskType)) &&
+                   (!selectedPriorities.length || selectedPriorities.includes(priority)) &&
+                   (!selectedDueDate || dueDate < selectedDueDate); // Change filter logic
+
+        card.style.display = show ? "block" : "none";
+    });
+}

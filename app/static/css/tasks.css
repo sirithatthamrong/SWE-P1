@@ -1,6 +1,3 @@
-/* tasks.css */
-
-/* General styles */
 body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
@@ -8,59 +5,165 @@ body {
     padding: 0;
 }
 
-/* High priority section */
-.high-priority-section {
-    margin: 20px;
-    padding: 10px;
-    border: 2px solid #ff6666;
-    background-color: #ffe6e6;
-    border-radius: 5px;
+/* Style Overdue Tasks */
+.overdue-tasks-section {
+    margin: 20px auto;
+    background: #eef3f7;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.high-priority-tasks {
+.overdue-tasks-section h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.overdue-tasks {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.task-card {
-    background: #ffffff;
-    border: 1px solid #dddddd;
+.overdue-task-card {
+    background-color: #ffe6e6; /* Light red background */
+    color: #721c24;
     border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.overdue-task-card:hover {
+    transform: scale(1.05);
+    background-color: #f8d0d0;
+}
+
+.task-header {
+    font-size: 16px;
+    font-weight: bold;
+    color: #b71c1c;
+}
+
+.task-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.complete-task-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+}
+
+.complete-task-btn:hover {
+    background-color: #218838;
+}
+
+/* Ensure the main container uses flexbox */
+.main-container {
+    display: flex;
+    flex-direction: row;  /* Ensure horizontal layout */
+    gap: 20px;  /* Space between filters and tasks */
     padding: 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    background: #eef3f7;
+    border-radius: 10px;
+    margin: 20px auto;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-    /* Make cards narrower */
-    width: calc(30% - 10px);
+.filters h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
 
+.task-columns {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Each column takes half of the available space */
+.task-column {
+    width: 50%;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.task-column h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.task-card {
+    background: #7e71b5;
+    color: white;
+    border: 1px solid #dddddd;
+    border-radius: 8px; /* Reduce border radius */
+    padding: 10px; /* Reduce padding */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    /*width: calc(25% - 10px); !* Reduce width *!*/
+    width: 300px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px; /* Reduce spacing inside the card */
+    font-size: 14px; /* Reduce font size */
 }
 
 .task-card h3 {
-    font-size: 22px;
-    color: #333333;
+    font-size: 18px; /* Smaller title */
+    color: white;
+    margin-bottom: 5px; /* Reduce bottom margin */
 }
 
 .task-card p {
-    margin: 5px 0;
-    color: #555555;
-    font-size: 14px;
+    margin: 3px 0;
+    color: white;
+    font-size: 12px;
 }
 
 .task-card:hover {
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    background-color: #5b4b78;
+    transform: scale(1.05);
+}
+
+.task-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
 }
 
 /* Tabs Section */
 .tabs-section {
-    margin: 20px;
+    flex-grow: 1; /* Allow the task section to expand */
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    width: 90%; /* Full width */
 }
 
 .tabs {
     display: flex;
+    justify-content: space-between; /* Ensure tabs distribute evenly */
     border-bottom: 2px solid #cccccc;
     margin-bottom: 10px;
 }
@@ -122,6 +225,7 @@ body {
 .modal-content button:hover {
     background-color: #0056b3;
 }
+
 .flashes {
     list-style-type: none;
     padding: 0;
@@ -141,4 +245,132 @@ body {
 .danger {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+/* Filters should be positioned on the left */
+.filters {
+    width: 320px;
+    padding: 20px;
+    border-radius: 10px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.filter-section {
+    margin-bottom: 15px;
+    width: 300px;
+}
+
+/* Improve spacing and alignment for checkboxes */
+.filter-section label{
+    font-size: 16px;
+    /*font-weight: bold;*/
+    color: #333;
+    cursor: pointer;
+}
+
+.filter-section input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2); /* Slightly enlarge checkboxes */
+}
+
+.filter-btn {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #74a9e3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+}
+
+.filter-section input[type="date"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #0056b3;
+}
+
+.create-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 1400px; /* Adjust width */
+    padding: 10px 0;
+}
+
+.create-task-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.create-task-form label {
+    font-weight: bold;
+    color: #333;
+}
+
+.create-task-form input,
+.create-task-form textarea,
+.create-task-form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background: white;
+}
+
+.create-task-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Align Task Type and Priority Dropdowns */
+.form-row {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Button Styling */
+.submit-btn {
+    padding: 10px 20px;
+    background-color: #74a9e3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    align-self: flex-start;
+    font-weight: bold;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.no-overdue-tasks {
+    font-size: 16px;
+    color: #777;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 10px;
 }

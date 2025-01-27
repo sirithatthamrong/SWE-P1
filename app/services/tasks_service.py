@@ -1,14 +1,13 @@
-# app/services/tasks_service.py
-
 from datetime import datetime
 from sqlalchemy import text
 from app import db
+from flask import jsonify
 
 
 def get_tasks_for_user(user_id):
     """
-    Fetch tasks assigned to a specific user,
-    now that we store assignment in TaskAssignments.
+    Fetch tasks assigned to a specific user.
+    Prioritize overdue tasks first, then sort by due date.
     """
     query = text("""
         SELECT
@@ -26,7 +25,12 @@ def get_tasks_for_user(user_id):
         JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
         JOIN TaskAssignments ta ON ta.task_id = t.task_id
         WHERE ta.user_id = :user_id
-        ORDER BY t.due_date ASC
+        ORDER BY 
+            CASE 
+                WHEN t.status = 'overdue' THEN 1  -- Show overdue tasks first
+                ELSE 2 
+            END,
+            t.due_date ASC  -- Then sort by due date
     """)
 
     result = db.session.execute(query, {"user_id": user_id}).fetchall()
@@ -94,12 +98,12 @@ def create_task(data, creator_id):
         required = ["task_name", "task_description", "due_date", "task_type_id", "assigned_to"]
         missing = [field for field in required if not data.get(field)]
         if missing:
-            return {"error": f"Missing required field(s): {', '.join(missing)}"}, 400
+            return jsonify({"error": f"Missing required field(s): {', '.join(missing)}"}), 400
 
         # Validate due date
         due_date = datetime.strptime(data["due_date"], "%Y-%m-%d")
         if due_date.date() < datetime.now().date():  # Ensure date comparison ignores time
-            return {"error": "Due date cannot be in the past."}, 400
+            return jsonify({"error": "Due date cannot be in the past."}), 400
 
         # Insert into Tasks first
         insert_task = text("""
@@ -155,44 +159,44 @@ def create_task(data, creator_id):
 
         db.session.commit()
 
-        return {"message": "Task created successfully!"}, 201
+        return jsonify({"message": "Task created successfully!"}), 201
 
     except Exception as e:
         db.session.rollback()
-        return {"error": str(e)}, 500
+        return jsonify({"error": str(e)}), 500
 
 
 def accept_task(task_id, user_id):
-    """
-    Call the 'accept_task' SQL function to update the task status.
-    """
     try:
         query = text("SELECT accept_task(:task_id, :user_id)")
         result = db.session.execute(query, {"task_id": task_id, "user_id": user_id}).scalar()
         db.session.commit()
 
-        if result:  # Check if the task was successfully accepted
-            return {"message": "Task accepted."}, 200
+        if result:
+            return jsonify({"message": "Task accepted."}), 200
         else:
-            return {"error": "Task is not pending or not assigned to you."}, 400
+            return jsonify({"error": "Task is not pending or not assigned to you."}), 400
     except Exception as e:
         db.session.rollback()
-        return {"error": str(e)}, 500
+        return jsonify({"error": str(e)}), 500
 
 
 def complete_task(task_id, user_id):
-    """
-    Call the 'complete_task' SQL function to update the task status.
-    """
     try:
-        query = text("SELECT complete_task(:task_id, :user_id)")
-        result = db.session.execute(query, {"task_id": task_id, "user_id": user_id}).scalar()
+        query = text("""
+            UPDATE Tasks
+            SET status = 'completed', completed_at = CURRENT_TIMESTAMP
+            WHERE task_id = :task_id
+              AND status IN ('overdue', 'in progress')
+            RETURNING task_id
+        """)
+        result = db.session.execute(query, {"task_id": task_id})
         db.session.commit()
 
-        if result:  # Check if the task was successfully completed
-            return {"message": "Task completed!"}, 200
+        if result.rowcount > 0:
+            return jsonify({"message": "Task completed!"}), 200
         else:
-            return {"error": "Task is not in progress or not assigned to you."}, 400
+            return jsonify({"error": "Task is not overdue or in progress."}), 400
     except Exception as e:
         db.session.rollback()
-        return {"error": str(e)}, 500
+        return jsonify({"error": str(e)}), 500
