@@ -29,6 +29,7 @@ function fetchAvailableRooms() {
     .then(data => {
         totalRooms = data.available_rooms;
         totalPages = Math.ceil(totalRooms.length / roomsPerPage);
+        currentPage = 1; // Reset to first page
         displayRooms();
     });
 }
