@@ -216,7 +216,7 @@ body {
     margin: 5px;
     padding: 10px 20px;
     border: none;
-    background-color: #007bff;
+    background-color: #74a9e3;
     color: #ffffff;
     cursor: pointer;
     border-radius: 5px;
@@ -373,4 +373,40 @@ body {
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-top: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 10px; /* Space between buttons */
+    margin-top: 15px;
+    width: 100%;
+}
+
+
+.modal-buttons .close-btn {
+    background-color: #74a9e3;
+    color: white;
+}
+
+.modal-buttons .close-btn:hover {
+    background-color: #0056b3;
+}
+
+.modal-buttons .accept-btn {
+    background-color: #74a9e3;
+    color: white;
+}
+
+.modal-buttons .accept-btn:hover {
+    background-color: #0056b3;
+}
+
+.modal-buttons .delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.modal-buttons .delete-btn:hover {
+    background-color: #cc0000;
 }
