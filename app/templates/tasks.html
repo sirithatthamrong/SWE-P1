@@ -224,18 +224,22 @@
                 <p><strong>Due Date:</strong> <span id="modal-task-due-date"></span></p>
                 <p><strong>Priority:</strong> <span id="modal-task-priority"></span></p>
 
-                <!-- Accept -->
-                <form id="acceptForm" action="" method="POST" style="display: none;">
-                    <button type="submit">Accept Task</button>
-                </form>
+                <div class="modal-buttons">
+                    <!-- Accept -->
+                    <form id="acceptForm" action="" method="POST" style="display: none;">
+                        <button type="submit" class="accept-btn">Accept Task</button>
+                    </form>
+                    <!-- Delete for the owner -->
+                    <form id="deleteForm" action="" method="POST" style="display: none;">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                </div>
+
                 <!-- Complete -->
                 <form id="completeForm" action="" method="POST" style="display: none;">
-                    <button type="submit">Complete Task</button>
+                    <button type="submit" class="modal-close">Complete Task</button>
                 </form>
-                <!-- Delete for the owner -->
-                <form id="deleteForm" action="" method="POST" style="display: none;">
-                    <button type="submit" style="background-color: red; color: white;">Delete</button>
-                </form>
+
 
                 <button onclick="closeTaskModal()">Close</button>
             </div>
