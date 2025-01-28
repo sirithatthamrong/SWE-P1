@@ -11,7 +11,7 @@ from flask import (
 from sqlalchemy import text
 from app import db
 from datetime import datetime
-from app.services.auth_service import signup_user, login_user, login_required
+from app.services.auth_service import signup_user, login_user, login_required, role_required
 from app.services.tasks_service import (
     get_tasks_for_user,
     get_tasks_created_by_user,
@@ -19,6 +19,12 @@ from app.services.tasks_service import (
     accept_task,
     complete_task
 )
+
+from app.services.technician_service import (
+    get_all_inventory_items,
+    update_inventory_item
+)
+
 from app.services.booking_service import (
     get_lab_zones,
     get_experiment_types,
@@ -330,3 +336,34 @@ def profile():
     roles = [row.role for row in roles_query]
 
     return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
+
+# -------------------------------------------------------------------
+#                      Technician Page
+# -------------------------------------------------------------------
+
+@main.route('/inventory', methods=['GET', 'POST'])
+@login_required
+@role_required('technician', 'admin')
+def inventory_page():
+    """
+    Page for technicians (or admin) to see items and update stock counts.
+    """
+    if request.method == 'POST':
+        item_id = request.form.get('item_id')
+        new_qty = request.form.get('new_quantity')
+        if not item_id or not new_qty:
+            flash("Missing item_id or new_quantity.", "danger")
+            return redirect(url_for('main.inventory_page'))
+
+        # Call the service-layer function to update
+        response, status_code = update_inventory_item(item_id, int(new_qty), session['user_id'])
+        if status_code == 200:
+            flash("Inventory updated successfully!", "success")
+        else:
+            flash(response.get("error"), "danger")
+
+        return redirect(url_for('main.inventory_page'))
+
+    # If GET request, fetch and display items
+    items = get_all_inventory_items()
+    return render_template("tech_inventory.html", items=items)
