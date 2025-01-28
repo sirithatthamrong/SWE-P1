@@ -173,7 +173,7 @@ def cancel_room_booking(reservation_id, user_id):
         """)
         result = db.session.execute(check_query, {"reservation_id": reservation_id}).fetchone()
 
-        if result is None or result.user_id != user_id:
+        if not result or result.user_id != user_id:
             return False
 
         update_query = text("""
@@ -184,6 +184,7 @@ def cancel_room_booking(reservation_id, user_id):
         db.session.execute(update_query, {"reservation_id": reservation_id})
 
         db.session.commit()
+        print(f"Booking {reservation_id} canceled successfully.")
         return True
 
     except Exception as e:
