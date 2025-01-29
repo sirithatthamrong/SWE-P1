@@ -85,6 +85,7 @@
                                      data-task-type="{{ task.task_type|escape }}"
                                      data-priority="{{ task.priority }}"
                                      data-status="{{ task.status }}"
+                                     data-creator-name="{{ task.creator_name }}"
                                      data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                                      onclick="showTaskModal({{ task.task_id }})">
                                     <h3>{{ task.task_name }}</h3>
@@ -109,6 +110,7 @@
                                      data-task-type="{{ task.task_type|escape }}"
                                      data-priority="{{ task.priority }}"
                                      data-status="{{ task.status }}"
+                                     data-creator-name="{{ task.creator_name }}"
                                      data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                                      onclick="showTaskModal({{ task.task_id }})">
                                     <h3>{{ task.task_name }}</h3>
@@ -134,6 +136,7 @@
                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
+                             data-creator-name="{{ task.creator_name }}"
                              data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                              onclick="showTaskModal({{ task.task_id }})">
                             <h3>{{ task.task_name }}</h3>
@@ -157,6 +160,7 @@
                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
+                             data-creator-name="{{ task.creator_name }}"
                              data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                              onclick="showTaskModal({{ task.task_id }})">
                             <h3>{{ task.task_name }}</h3>
@@ -225,6 +229,7 @@
                 <p id="modal-task-description"></p>
                 <p><strong>Due Date:</strong> <span id="modal-task-due-date"></span></p>
                 <p><strong>Priority:</strong> <span id="modal-task-priority"></span></p>
+                <p><strong>Created By:</strong> <span id="modal-task-creator"></span></p> <!-- Add this line -->
 
                 <div class="modal-buttons">
                     <!-- Accept -->
