@@ -143,56 +143,75 @@ $$
 DECLARE
     v_batch_id        INTEGER;
     v_old_qty         INTEGER;
-    v_quantity_change INTEGER;
     v_use_date        DATE;
+    v_total_qty       INTEGER;
+    v_reorder_level   INTEGER;
+    v_task_id         INTEGER;
 BEGIN
-    -- Normalize expiration date
+    -- Normalize expiration date (default for no-expiry items)
     IF p_expiration_date IS NULL OR p_expiration_date = '9999-12-31' THEN
         v_use_date := '9999-12-31';
     ELSE
         v_use_date := p_expiration_date;
     END IF;
 
-    -- Check if a batch exists for the given item and expiration date
-    SELECT batch_id, quantity
-    INTO v_batch_id, v_old_qty
+    --  Ensure batch exists, then replace quantity (not add)
+    SELECT batch_id, quantity INTO v_batch_id, v_old_qty
     FROM InventoryBatches
-    WHERE item_id = p_item_id
-      AND expiration_date = v_use_date;
+    WHERE item_id = p_item_id AND expiration_date = v_use_date
+    FOR UPDATE;  -- Locks row to prevent conflicts
 
     IF FOUND THEN
-        -- Update existing batch
+        -- Replace quantity instead of adding
         UPDATE InventoryBatches
-        SET quantity = quantity + p_new_quantity
+        SET quantity = p_new_quantity
         WHERE batch_id = v_batch_id;
-
-        v_quantity_change := p_new_quantity;
     ELSE
-        -- Insert a new batch and correctly store the RETURNING value
+        -- Insert new batch if not found
         INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
         VALUES (p_item_id, p_new_quantity, v_use_date)
         RETURNING batch_id INTO v_batch_id;
-
-        v_quantity_change := p_new_quantity;
     END IF;
 
-    -- Log the inventory change
-    INSERT INTO InventoryLogs (
-        item_id,
-        action,
-        quantity_change,
-        performed_by,
-        action_date
-    )
-    VALUES (
-        p_item_id,
-        'restocked',
-        v_quantity_change,
-        p_performed_by,
-        CURRENT_TIMESTAMP
-    );
+    -- Recalculate total quantity (ensure SUM works even if 0)
+    SELECT COALESCE(SUM(quantity), 0), reorder_level
+    INTO v_total_qty, v_reorder_level
+    FROM InventoryBatches
+    JOIN InventoryItems USING (item_id)
+    WHERE item_id = p_item_id
+    GROUP BY reorder_level;
 
-    -- Ensure function returns a proper message
+    -- Always allow stock updates, even below reorder level
+    INSERT INTO InventoryLogs (item_id, action, quantity_change, performed_by, action_date)
+    VALUES (p_item_id, 'restocked', p_new_quantity, p_performed_by, CURRENT_TIMESTAMP);
+
+    -- If stock falls below reorder level, create a task **only if it doesn’t exist**
+    IF v_total_qty <= v_reorder_level THEN
+        SELECT task_id INTO v_task_id
+        FROM Tasks
+        WHERE task_name = 'LOW STOCK - ' || p_item_id
+          AND status IN ('pending', 'in progress')
+        LIMIT 1;
+
+        IF v_task_id IS NULL THEN
+            -- Insert low-stock task
+            INSERT INTO Tasks (task_name, task_description, due_date, task_type_id, priority, created_by)
+            VALUES (
+                'LOW STOCK - ' || p_item_id,
+                'Item ID ' || p_item_id || ' is below reorder level. Current qty: ' || v_total_qty || ', reorder level: ' || v_reorder_level,
+                CURRENT_DATE + INTERVAL '1 day',
+                (SELECT task_type_id FROM TaskTypes WHERE task_name = 'Maintenance' LIMIT 1),
+                'high',
+                0
+            )
+            RETURNING task_id INTO v_task_id;
+
+            -- Assign task to all technicians
+            INSERT INTO TaskAssignments (task_id, user_id)
+            SELECT v_task_id, user_id FROM Users WHERE role = 'technician';
+        END IF;
+    END IF;
+
     RETURN 'Inventory updated successfully';
 END;
 $$ LANGUAGE plpgsql;
