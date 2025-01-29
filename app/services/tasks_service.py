@@ -109,6 +109,15 @@ def assign_users_to_task(task_id, assigned_users):
         if not user_ids:
             return {"error": "At least one user must be assigned."}, 400
 
+        # Validate that all user IDs exist in the database
+        valid_users_query = text("SELECT user_id FROM Users WHERE user_id IN :user_ids")
+        valid_users = db.session.execute(valid_users_query, {"user_ids": tuple(user_ids)}).fetchall()
+        valid_user_ids = {row.user_id for row in valid_users}
+
+        for uid in user_ids:
+            if int(uid) not in valid_user_ids:
+                return {"error": f"User ID {uid} does not exist."}, 400
+
         insert_assignment = text("""
             INSERT INTO TaskAssignments (task_id, user_id) VALUES (:task_id, :user_id)
         """)

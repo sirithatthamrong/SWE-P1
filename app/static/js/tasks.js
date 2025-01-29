@@ -126,3 +126,21 @@ function applyFilters() {
         card.style.display = show ? "block" : "none";
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector(".create-task-form");
+
+    form.addEventListener("submit", function (event) {
+        const assignedToInput = document.getElementById("assigned_to");
+        const assignedUserIds = assignedToInput.value.split(";").map(id => id.trim());
+
+        // Check if all IDs exist in validUserIds
+        for (const userId of assignedUserIds) {
+            if (!validUserIds.includes(parseInt(userId))) {
+                alert(`Error: User ID ${userId} does not exist.`);
+                event.preventDefault();  // Prevent form submission
+                return;
+            }
+        }
+    });
+});
