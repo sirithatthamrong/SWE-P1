@@ -90,6 +90,7 @@
                                     <h3>{{ task.task_name }}</h3>
                                     <p><strong>Priority:</strong> {{ task.priority }}</p>
                                     <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                                    <p><strong>Status:</strong> {{ task.status }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -111,8 +112,9 @@
                                      data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
                                      onclick="showTaskModal({{ task.task_id }})">
                                     <h3>{{ task.task_name }}</h3>
-                                    <p><strong>Description:</strong> {{ task.task_description }}</p>
+                                    <p><strong>Priority:</strong> {{ task.priority }}</p>
                                     <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+                                    <p><strong>Status:</strong> {{ task.status }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -132,8 +134,10 @@
                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
-                             data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}">
+                             data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
+                             onclick="showTaskModal({{ task.task_id }})">
                             <h3>{{ task.task_name }}</h3>
+                            <p><strong>Priority:</strong> {{ task.priority }}</p>
                             <p><strong>Due Date:</strong> {{ task.due_date }}</p>
                             <p><strong>Status:</strong> {{ task.status }}</p>
                         </div>
@@ -153,12 +157,10 @@
                              data-task-type="{{ task.task_type|escape }}"
                              data-priority="{{ task.priority }}"
                              data-status="{{ task.status }}"
-                             data-owned="true"
-                             onclick="showTaskModal({{ task.task_id }})"
-                        >
+                             data-owned="{{ 'true' if task.created_by == session['user_id'] else 'false' }}"
+                             onclick="showTaskModal({{ task.task_id }})">
                             <h3>{{ task.task_name }}</h3>
                             <p><strong>Priority:</strong> {{ task.priority }}</p>
-                            {#                            <p><strong>Description:</strong> {{ task.task_description }}</p>#}
                             <p><strong>Due Date:</strong> {{ task.due_date }}</p>
                             <p><strong>Status:</strong> {{ task.status }}</p>
                         </div>

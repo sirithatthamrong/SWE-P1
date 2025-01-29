@@ -131,3 +131,46 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_tasks_for_user(p_user_id INT)
+    RETURNS TABLE
+            (
+                task_id          INT,
+                task_name        TEXT,
+                task_description TEXT,
+                due_date         DATE,
+                priority         TEXT,
+                status           TEXT,
+                created_at       TIMESTAMP,
+                updated_at       TIMESTAMP,
+                created_by       INT,
+                creator_name     TEXT,
+                task_type        TEXT
+            )
+AS
+$$
+BEGIN
+    RETURN QUERY
+        SELECT t.task_id,
+               t.task_name::TEXT, -- Ensure VARCHAR(100) is cast to TEXT
+               t.task_description,
+               t.due_date,
+               t.priority::TEXT, -- Cast ENUM or VARCHAR(100) to TEXT
+               t.status::TEXT,  -- Cast ENUM or VARCHAR(100) to TEXT
+               t.created_at,
+               t.updated_at,
+               t.created_by,
+               u.username::TEXT AS creator_name, -- Ensure VARCHAR(100) is cast to TEXT
+               tt.task_name::TEXT AS task_type -- Ensure VARCHAR(100) is cast to TEXT
+        FROM Tasks t
+                 JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
+                 JOIN TaskAssignments ta ON ta.task_id = t.task_id
+                 JOIN Users u ON t.created_by = u.user_id
+        WHERE ta.user_id = p_user_id
+        ORDER BY CASE
+                     WHEN t.status = 'overdue' THEN 1
+                     ELSE 2
+                 END,
+                 t.due_date ASC;
+END;
+$$ LANGUAGE plpgsql;

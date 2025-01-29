@@ -74,7 +74,7 @@ def signup():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        role = request.form.get('role', 'user')  # Default to 'user' if none selected
+        role = request.form.get('role', 'user')
 
         if signup_user(username, email, password, role):
             return redirect(url_for('main.login'))
@@ -101,20 +101,17 @@ def tasks_page():
     if request.method == 'POST':
         data = request.form
         response, status_code = create_task(data, creator_id=user_id)
-        if status_code == 201:
+        if status_code == 200:
             flash("Task created successfully!", "success")
         else:
-            flash(response.get("error"), "danger")
+            flash(response["error"], "danger")
         return redirect(url_for('main.tasks_page'))
 
-    # --- On GET: read which tab should be active
     active_tab = request.args.get('tab', 'my-tasks')
 
-    # get user tasks
     tasks_assigned = get_tasks_for_user(user_id)
     my_created_tasks = get_tasks_created_by_user(user_id)
 
-    # get TaskTypes
     task_types_query = text("SELECT task_type_id, task_name FROM TaskTypes")
     task_types_result = db.session.execute(task_types_query).fetchall()
     task_types = [
@@ -127,25 +124,21 @@ def tasks_page():
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
-        active_tab=active_tab  # pass to template
+        active_tab=active_tab
     )
 
 
 @main.route('/tasks/<int:task_id>/accept', methods=['POST', 'GET'])
 @login_required
 def accept_task_route(task_id):
-    """
-    Called when user accepts a pending task.
-    We read ?tab=..., then redirect back to tasks_page with that tab.
-    """
     user_id = session.get('user_id')
-    next_tab = request.args.get('tab', 'my-tasks')  # default to 'my-tasks'
+    next_tab = request.args.get('tab', 'my-tasks')
 
     response, status_code = accept_task(task_id, user_id)
     if status_code == 200:
         flash("Task accepted!", "success")
     else:
-        jsonify({"error": response.get("error")}), 400
+        flash(response["error"], "danger")
 
     return redirect(url_for('main.tasks_page', tab=next_tab))
 
@@ -153,15 +146,14 @@ def accept_task_route(task_id):
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
 @login_required
 def complete_task_route(task_id):
-    user_id = session.get('user_id')
     next_tab = request.args.get('tab', 'completed')
 
-    response, status_code = complete_task(task_id, user_id)
+    response, status_code = complete_task(task_id)
 
     if status_code == 200:
         flash("Task completed!", "success")
     else:
-        flash(response.get("error"), "danger")
+        flash(response["error"], "danger")
 
     return redirect(url_for('main.tasks_page', tab=next_tab))
 
@@ -169,11 +161,6 @@ def complete_task_route(task_id):
 @main.route('/tasks/<int:task_id>/delete', methods=['POST'])
 @login_required
 def delete_task_route(task_id):
-    """
-    Only the user who created the task can delete it.
-    We'll read ?tab=..., then redirect back to that tab
-    (often 'my-creations').
-    """
     user_id = session.get('user_id')
     next_tab = request.args.get('tab', 'my-creations')
 
