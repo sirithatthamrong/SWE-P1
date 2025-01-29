@@ -146,43 +146,37 @@ DECLARE
     v_quantity_change INTEGER;
     v_use_date        DATE;
 BEGIN
-    -- If no date is provided or user typed 9999-12-31 => unify to 9999-12-31
+    -- Normalize expiration date
     IF p_expiration_date IS NULL OR p_expiration_date = '9999-12-31' THEN
         v_use_date := '9999-12-31';
     ELSE
         v_use_date := p_expiration_date;
     END IF;
 
-    -- Try to find an existing batch for (item_id, date)
+    -- Check if a batch exists for the given item and expiration date
     SELECT batch_id, quantity
-      INTO v_batch_id, v_old_qty
-      FROM InventoryBatches
-     WHERE item_id = p_item_id
-       AND expiration_date = v_use_date;
+    INTO v_batch_id, v_old_qty
+    FROM InventoryBatches
+    WHERE item_id = p_item_id
+      AND expiration_date = v_use_date;
 
     IF FOUND THEN
-        -- Replace that batch's quantity
+        -- Update existing batch
         UPDATE InventoryBatches
-           SET quantity = p_new_quantity
-         WHERE batch_id = v_batch_id;
+        SET quantity = quantity + p_new_quantity
+        WHERE batch_id = v_batch_id;
 
-        v_quantity_change := p_new_quantity - v_old_qty;
-
+        v_quantity_change := p_new_quantity;
     ELSE
-        -- Insert a new row
+        -- Insert a new batch and correctly store the RETURNING value
         INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
         VALUES (p_item_id, p_new_quantity, v_use_date)
-        RETURNING batch_id;
+        RETURNING batch_id INTO v_batch_id;
 
-        v_batch_id := CURRVAL(pg_get_serial_sequence('inventorybatches','batch_id'));
         v_quantity_change := p_new_quantity;
     END IF;
 
-    IF NOT FOUND THEN
-        RETURN 'No rows updated';
-    END IF;
-
-    -- Optionally log in InventoryLogs if you want
+    -- Log the inventory change
     INSERT INTO InventoryLogs (
         item_id,
         action,
@@ -198,6 +192,7 @@ BEGIN
         CURRENT_TIMESTAMP
     );
 
+    -- Ensure function returns a proper message
     RETURN 'Inventory updated successfully';
 END;
 $$ LANGUAGE plpgsql;

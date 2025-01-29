@@ -2,10 +2,10 @@
 {% block title %}Inventory{% endblock %}
 
 {% block content %}
-<h2>Inventory Items</h2>
+    <h2>Inventory Items</h2>
 
-<table border="1" cellpadding="8">
-    <thead>
+    <table border="1" cellpadding="8">
+        <thead>
         <tr>
             <th>Item Name</th>
             <th>Category</th>
@@ -15,90 +15,89 @@
             <th>Expiry Date</th>
             <th>Update</th>
         </tr>
-    </thead>
-    <tbody>
-    {% for data in items %}
-        {# Start each item's total at zero #}
-        {% set total_qty = 0 %}
-        {# Flag to see if we have any real expiry #}
-        {% set has_real_expiry = false %}
+        </thead>
+        <tbody>
+        {% for data in items %}
+            {# Start each item's total at zero #}
+            {% set total_qty = 0 %}
+            {# Flag to see if we have any real expiry #}
+            {% set has_real_expiry = false %}
 
-        {# Loop through each batch; add up the quantity #}
-        {% for b in data["batches"] %}
-            {% set total_qty = total_qty + b["quantity"] %}
+            {# Loop through each batch; add up the quantity #}
+            {% for b in data["batches"] %}
+                {% set total_qty = total_qty + b["quantity"] %}
 
-            {# Force the DB date to a string, then slice only first 10 chars #}
-            {% set date_str = (b["expiration_date"]|string)[:10] %}
+                {# Force the DB date to a string, then slice only first 10 chars #}
+                {% set date_str = (b["expiration_date"]|string)[:10] %}
 
-            {# If it's not 9999-12-31, that means we have a real expiry #}
-            {% if date_str != "9999-12-31" %}
-                {% set has_real_expiry = true %}
+                {# If it's not 9999-12-31, that means we have a real expiry #}
+                {% if date_str != "9999-12-31" %}
+                    {% set has_real_expiry = true %}
+                {% endif %}
+            {% endfor %}
+
+            <tr>
+                <td>{{ data["item"]["name"] }}</td>
+                <td>{{ data["item"]["category_name"] }}</td>
+                <td>{{ data.total_qty }}</td>  <!-- Fixed the extra <td> -->
+                <td>
+                    {% if data.has_real_expiry %}
+                        <span style="color: green;">Has Expiry</span>
+                    {% else %}
+                        <span style="color: #999;">No Expiry</span>
+                    {% endif %}
+                </td>
+
+                {# A small form to allow updating/inserting a batch #}
+                <form action="{{ url_for('main.inventory_page') }}" method="POST">
+                    <td>
+                        <input type="number"
+                               name="new_quantity"
+                               min="0"
+                               style="width:60px"
+                               placeholder="Qty"
+                               required>
+                        <input type="hidden"
+                               name="item_id"
+                               value="{{ data['item']['item_id'] }}">
+                    </td>
+                    <td>
+                        {% if data.has_real_expiry %}
+                            <input type="date" name="expiration_date" style="width:140px">
+                        {% else %}
+                            <input type="date" name="expiration_date" style="width:140px; display: none;" disabled>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="submit">Save</button>
+                    </td>
+                </form>
+            </tr>
+
+            {# If there are any batches, list them in a second row #}
+            {% if data["batches"] %}
+                <tr style="background:#fafafa;">
+                    <td colspan="7" style="font-size:0.9em;">
+                        <strong>Batches:</strong>
+                        <ul style="margin:0; padding-left:1.5em;">
+                            {% for batch in data["batches"] %}
+                                {# again, take the first 10 chars #}
+                                {% set b_str = (batch["expiration_date"]|string)[:10] %}
+
+                                <li>
+                                    {% if b_str == "9999-12-31" %}
+                                        Expires <strong>No Expiry</strong>,
+                                    {% else %}
+                                        Expires <strong>{{ b_str }}</strong>,
+                                    {% endif %}
+                                    Qty <strong>{{ batch["quantity"] }}</strong>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
             {% endif %}
         {% endfor %}
-
-        <tr>
-            <td>{{ data["item"]["name"] }}</td>
-            <td>{{ data["item"]["category_name"] }}</td>
-            {# Display the summed total in the "Total Qty" column #}
-            <td>{{ data.total_qty }}</td><td>{{ data.total_qty }}</td>
-            <td>
-
-                {% if data.has_real_expiry %}
-                    <span style="color: green;">Has Expiry</span>
-                {% else %}
-                    <span style="color: #999;">No Expiry</span>
-                {% endif %}
-
-            </td>
-
-            {# A small form to allow updating/inserting a batch #}
-            <form action="{{ url_for('main.inventory_page') }}" method="POST">
-                <td>
-                    <input type="number"
-                           name="new_quantity"
-                           min="0"
-                           style="width:60px"
-                           placeholder="Qty"
-                           required>
-                    <input type="hidden"
-                           name="item_id"
-                           value="{{ data['item']['item_id'] }}">
-                </td>
-                <td>
-                    <input type="date"
-                           name="expiration_date"
-                           style="width:140px">
-                </td>
-                <td>
-                    <button type="submit">Save</button>
-                </td>
-            </form>
-        </tr>
-
-        {# If there are any batches, list them in a second row #}
-        {% if data["batches"] %}
-            <tr style="background:#fafafa;">
-                <td colspan="7" style="font-size:0.9em;">
-                    <strong>Batches:</strong>
-                    <ul style="margin:0; padding-left:1.5em;">
-                        {% for batch in data["batches"] %}
-                            {# again, take the first 10 chars #}
-                            {% set b_str = (batch["expiration_date"]|string)[:10] %}
-
-                            <li>
-                                {% if b_str == "9999-12-31" %}
-                                    Expires <strong>No Expiry</strong>,
-                                {% else %}
-                                    Expires <strong>{{ b_str }}</strong>,
-                                {% endif %}
-                                Qty <strong>{{ batch["quantity"] }}</strong>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-        {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
 {% endblock %}
