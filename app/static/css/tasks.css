@@ -132,6 +132,7 @@ body {
     font-size: 18px; /* Smaller title */
     color: white;
     margin-bottom: 5px; /* Reduce bottom margin */
+    font-weight: bold;
 }
 
 .task-card p {
