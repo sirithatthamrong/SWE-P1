@@ -20,7 +20,7 @@ from app.services.tasks_service import (
     complete_task
 )
 
-from app.services.technician_service import (
+from app.services.inventory_service import (
     get_all_inventory_items,
     update_inventory_item
 )
@@ -41,7 +41,6 @@ from app.services.booking_service import (
 from app.services.calendar_service import fetch_calendar_data
 
 main = Blueprint('main', __name__)
-
 
 # -------------------------------------------------------------------
 #                      Health Check
@@ -133,17 +132,13 @@ def tasks_page():
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
-        active_tab=active_tab  # pass to template
+        active_tab=active_tab
     )
 
 
 @main.route('/tasks/<int:task_id>/accept', methods=['POST', 'GET'])
 @login_required
 def accept_task_route(task_id):
-    """
-    Called when user accepts a pending task.
-    We read ?tab=..., then redirect back to tasks_page with that tab.
-    """
     user_id = session.get('user_id')
     next_tab = request.args.get('tab', 'my-tasks')  # default to 'my-tasks'
 
@@ -175,11 +170,6 @@ def complete_task_route(task_id):
 @main.route('/tasks/<int:task_id>/delete', methods=['POST'])
 @login_required
 def delete_task_route(task_id):
-    """
-    Only the user who created the task can delete it.
-    We'll read ?tab=..., then redirect back to that tab
-    (often 'my-creations').
-    """
     user_id = session.get('user_id')
     next_tab = request.args.get('tab', 'my-creations')
 
@@ -337,26 +327,34 @@ def profile():
 
     return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
 
-# -------------------------------------------------------------------
-#                      Technician Page
-# -------------------------------------------------------------------
 
+# -------------------------------------------------------------------
+#                      Technician / Inventory Page
+# -------------------------------------------------------------------
 @main.route('/inventory', methods=['GET', 'POST'])
 @login_required
 @role_required('technician', 'admin')
+
 def inventory_page():
-    """
-    Page for technicians (or admin) to see items and update stock counts.
-    """
     if request.method == 'POST':
+        # read from the form
         item_id = request.form.get('item_id')
         new_qty = request.form.get('new_quantity')
+        expiration_date = request.form.get('expiration_date') or None
+        performed_by = session['user_id']
+
         if not item_id or not new_qty:
             flash("Missing item_id or new_quantity.", "danger")
             return redirect(url_for('main.inventory_page'))
 
-        # Call the service-layer function to update
-        response, status_code = update_inventory_item(item_id, int(new_qty), session['user_id'])
+        # call service layer
+        response, status_code = update_inventory_item(
+            item_id=item_id,
+            new_quantity=int(new_qty),
+            performed_by=performed_by,
+            expiration_date=expiration_date
+        )
+
         if status_code == 200:
             flash("Inventory updated successfully!", "success")
         else:
@@ -364,6 +362,6 @@ def inventory_page():
 
         return redirect(url_for('main.inventory_page'))
 
-    # If GET request, fetch and display items
+    # If GET, just fetch + display
     items = get_all_inventory_items()
-    return render_template("tech_inventory.html", items=items)
+    return render_template("inventory.html", items=items)
