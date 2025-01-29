@@ -256,4 +256,7 @@
             document.getElementById("due_date").setAttribute("min", today);
         });
     </script>
+    <script>
+        const validUserIds = {{ valid_user_ids | tojson }};
+    </script>
 {% endblock %}

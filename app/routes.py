@@ -114,17 +114,19 @@ def tasks_page():
 
     task_types_query = text("SELECT task_type_id, task_name FROM TaskTypes")
     task_types_result = db.session.execute(task_types_query).fetchall()
-    task_types = [
-        {"id": row.task_type_id, "name": row.task_name}
-        for row in task_types_result
-    ]
+    task_types = [{"id": row.task_type_id, "name": row.task_name} for row in task_types_result]
+
+    user_ids_query = text("SELECT user_id FROM Users")
+    user_ids_result = db.session.execute(user_ids_query).fetchall()
+    valid_user_ids = [row.user_id for row in user_ids_result]
 
     return render_template(
         'tasks.html',
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
-        active_tab=active_tab
+        active_tab=active_tab,
+        valid_user_ids=valid_user_ids
     )
 
 
