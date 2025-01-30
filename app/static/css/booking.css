@@ -23,7 +23,7 @@ body {
 .filter-section {
     flex: 1;
     max-width: 30%;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -104,7 +104,7 @@ body {
 /* --- Right Section: Available Rooms --- */
 .available-rooms-container {
     flex: 2;
-    padding: 20px;
+    padding: 10px 10px 10px 1px;
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
