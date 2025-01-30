@@ -10,6 +10,7 @@
             <th>Item Name</th>
             <th>Category</th>
             <th>Total Qty</th>
+            <th>Reorder Level (Debug)</th>   {# <-- added this so you can see reorder_level #}
             <th>Expiry Status</th>
             <th>Enter Qty</th>
             <th>Expiry Date</th>
@@ -18,28 +19,31 @@
         </thead>
         <tbody>
         {% for data in items %}
-            {# Start each item's total at zero #}
-            {% set total_qty = 0 %}
-            {# Flag to see if we have any real expiry #}
-            {% set has_real_expiry = false %}
-
-            {# Loop through each batch; add up the quantity #}
-            {% for b in data["batches"] %}
-                {% set total_qty = total_qty + b["quantity"] %}
-
-                {# Force the DB date to a string, then slice only first 10 chars #}
-                {% set date_str = (b["expiration_date"]|string)[:10] %}
-
-                {# If it's not 9999-12-31, that means we have a real expiry #}
-                {% if date_str != "9999-12-31" %}
-                    {% set has_real_expiry = true %}
-                {% endif %}
-            {% endfor %}
+            {#
+              We rely on data["total_qty"] from your Python code (inventory_service.py),
+              which presumably sums the batch quantities already.
+              Let's store it in a local variable 'computed_qty' so we can use it in
+              the condition and also display it in the table.
+            #}
+            {% set computed_qty = data.total_qty %}
+            {% set reorder_level = data["item"]["reorder_level"] %}
 
             <tr>
-                <td>{{ data["item"]["name"] }}</td>
+                {# 1) If total_qty < reorder_level, turn item name red #}
+                {% if computed_qty <= reorder_level %}
+                    <td style="color:red;">{{ data["item"]["name"] }}</td>
+                {% else %}
+                    <td>{{ data["item"]["name"] }}</td>
+                {% endif %}
+
                 <td>{{ data["item"]["category_name"] }}</td>
-                <td>{{ data.total_qty }}</td>  <!-- Fixed the extra <td> -->
+
+                {# 2) Show the total quantity from your python data #}
+                <td>{{ computed_qty }}</td>
+
+                {# 3) Show reorder_level for debugging #}
+                <td>{{ reorder_level }}</td>
+
                 <td>
                     {% if data.has_real_expiry %}
                         <span style="color: green;">Has Expiry</span>
@@ -77,7 +81,7 @@
             {# If there are any batches, list them in a second row #}
             {% if data["batches"] %}
                 <tr style="background:#fafafa;">
-                    <td colspan="7" style="font-size:0.9em;">
+                    <td colspan="8" style="font-size:0.9em;">
                         <strong>Batches:</strong>
                         <ul style="margin:0; padding-left:1.5em;">
                             {% for batch in data["batches"] %}
