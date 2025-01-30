@@ -11,6 +11,8 @@ from flask import (
 from sqlalchemy import text
 from app import db
 from datetime import datetime
+
+# Services
 from app.services.auth_service import signup_user, login_user, login_required, role_required
 from app.services.tasks_service import (
     get_tasks_for_user,
@@ -19,12 +21,10 @@ from app.services.tasks_service import (
     accept_task,
     complete_task
 )
-
 from app.services.inventory_service import (
     get_all_inventory_items,
     update_inventory_item
 )
-
 from app.services.booking_service import (
     get_lab_zones,
     get_experiment_types,
@@ -39,7 +39,11 @@ from app.services.booking_service import (
     get_upcoming_bookings
 )
 from app.services.calendar_service import fetch_calendar_data
-from app.services.verification_service import get_pending_verifications, approve_verification, reject_verification
+from app.services.verification_service import (
+    get_pending_verifications,
+    approve_verification,
+    reject_verification
+)
 
 main = Blueprint('main', __name__)
 
@@ -70,7 +74,17 @@ def login():
         username = request.form['username']
         password = request.form['password']
         if login_user(username, password):
+            user = db.session.execute(
+                text("SELECT * FROM Users WHERE username = :username"),
+                {"username": username}
+            ).fetchone()
+
+            if user:
+                session['user_id'] = user.user_id
+                session['username'] = user.username
+                session['role'] = user.role
             return redirect(url_for('main.home'))
+
     return render_template('login.html')
 
 
@@ -131,7 +145,6 @@ def tasks():
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
-
         active_tab=active_tab,
         valid_user_ids=valid_user_ids
     )
@@ -158,7 +171,6 @@ def complete_task_route(task_id):
     next_tab = request.args.get('tab', 'completed')
 
     response, status_code = complete_task(task_id)
-
     if status_code == 200:
         flash("Task completed!", "success")
     else:
@@ -213,11 +225,17 @@ def booking():
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
 
-        available_rooms = get_available_rooms(lab_zone_id, experiment_id, date, start_time, end_time)
-
-        return jsonify(
-            {"available_rooms": [{"lab_room_id": row.lab_room_id, "name": row.name} for row in available_rooms]}
+        available_rooms = get_available_rooms(
+            lab_zone_id, experiment_id, date,
+            start_time, end_time
         )
+
+        return jsonify({
+            "available_rooms": [
+                {"lab_room_id": row.lab_room_id, "name": row.name}
+                for row in available_rooms
+            ]
+        })
 
     upcoming_bookings = get_upcoming_bookings(session.get('user_id'))
 
@@ -245,7 +263,7 @@ def cancel_booking(reservation_id):
 @main.route('/booking/room/<int:room_id>', methods=['GET', 'POST'])
 @login_required
 def book_room(room_id):
-    date = request.args.get('date', None)
+    date = request.args.get('date')
 
     if date:
         today = datetime.now().date()
@@ -293,7 +311,6 @@ def book_room(room_id):
 @login_required
 def calendar():
     user_id = session.get('user_id')
-
     calendar_data = fetch_calendar_data(user_id)
 
     return render_template(
@@ -312,20 +329,20 @@ def calendar():
 @login_required
 def profile():
     user_id = session.get('user_id')
+    username = session.get('username')
+    role = session.get('role')
 
-    user = db.session.execute(text("SELECT * FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
-
-    if not user:
-        flash("User not found", "danger")
+    if not user_id or not username:
+        flash("User not found in session", "danger")
         return redirect(url_for('main.home'))
 
-    users = db.session.execute(text("SELECT * FROM Users")).fetchall()
+    user_data = {
+        "user_id": user_id,
+        "username": username,
+        "role": role
+    }
 
-    # Fetch distinct roles for filtering
-    roles_query = db.session.execute(text("SELECT DISTINCT role FROM Users"))
-    roles = [row.role for row in roles_query]
-
-    return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
+    return render_template('profile.html', user=user_data)
 
 
 # -------------------------------------------------------------------
@@ -336,7 +353,6 @@ def profile():
 @role_required('technician', 'admin')
 def inventory():
     if request.method == 'POST':
-        # read from the form
         item_id = request.form.get('item_id')
         new_qty = request.form.get('new_quantity')
         expiration_date = request.form.get('expiration_date') or None
@@ -346,7 +362,6 @@ def inventory():
             flash("Missing item_id or new_quantity.", "danger")
             return redirect(url_for('main.inventory'))
 
-        # call service layer
         response, status_code = update_inventory_item(
             item_id=item_id,
             new_quantity=int(new_qty),
@@ -361,18 +376,17 @@ def inventory():
 
         return redirect(url_for('main.inventory'))
 
-    # If GET, just fetch + display
     items = get_all_inventory_items()
     return render_template("inventory.html", items=items)
 
 
+# -------------------------------------------------------------------
+#                      Admin / Verification Page
+# -------------------------------------------------------------------
 @main.route('/verification', methods=['GET'])
 @login_required
 @role_required('admin')
 def verification():
-    """
-    Display all users pending verification.
-    """
     users = get_pending_verifications()
     return render_template("verification.html", users=users)
 
@@ -382,8 +396,10 @@ def verification():
 @role_required('admin')
 def approve_user(user_id):
     response, status_code = approve_verification(user_id)
-    flash(response["message"] if "message" in response else response["error"],
-          "success" if status_code == 200 else "danger")
+    flash(
+        response.get("message", response.get("error")),
+        "success" if status_code == 200 else "danger"
+    )
     return redirect(url_for('main.verification'))
 
 
@@ -392,6 +408,8 @@ def approve_user(user_id):
 @role_required('admin')
 def reject_user(user_id):
     response, status_code = reject_verification(user_id)
-    flash(response["message"] if "message" in response else response["error"],
-          "success" if status_code == 200 else "danger")
+    flash(
+        response.get("message", response.get("error")),
+        "success" if status_code == 200 else "danger"
+    )
     return redirect(url_for('main.verification'))
