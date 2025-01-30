@@ -11,8 +11,6 @@ from flask import (
 from sqlalchemy import text
 from app import db
 from datetime import datetime
-
-# Services
 from app.services.auth_service import signup_user, login_user, login_required, role_required
 from app.services.tasks_service import (
     get_tasks_for_user,
@@ -21,10 +19,12 @@ from app.services.tasks_service import (
     accept_task,
     complete_task
 )
+
 from app.services.inventory_service import (
     get_all_inventory_items,
     update_inventory_item
 )
+
 from app.services.booking_service import (
     get_lab_zones,
     get_experiment_types,
@@ -46,6 +46,7 @@ from app.services.verification_service import (
 )
 
 main = Blueprint('main', __name__)
+
 
 # -------------------------------------------------------------------
 #                      Health Check
@@ -74,17 +75,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         if login_user(username, password):
-            user = db.session.execute(
-                text("SELECT * FROM Users WHERE username = :username"),
-                {"username": username}
-            ).fetchone()
-
-            if user:
-                session['user_id'] = user.user_id
-                session['username'] = user.username
-                session['role'] = user.role
             return redirect(url_for('main.home'))
-
     return render_template('login.html')
 
 
@@ -311,6 +302,7 @@ def book_room(room_id):
 @login_required
 def calendar():
     user_id = session.get('user_id')
+
     calendar_data = fetch_calendar_data(user_id)
 
     return render_template(
@@ -329,20 +321,20 @@ def calendar():
 @login_required
 def profile():
     user_id = session.get('user_id')
-    username = session.get('username')
-    role = session.get('role')
 
-    if not user_id or not username:
-        flash("User not found in session", "danger")
+    user = db.session.execute(text("SELECT * FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+
+    if not user:
+        flash("User not found", "danger")
         return redirect(url_for('main.home'))
 
-    user_data = {
-        "user_id": user_id,
-        "username": username,
-        "role": role
-    }
+    users = db.session.execute(text("SELECT * FROM Users")).fetchall()
 
-    return render_template('profile.html', user=user_data)
+    # Fetch distinct roles for filtering
+    roles_query = db.session.execute(text("SELECT DISTINCT role FROM Users"))
+    roles = [row.role for row in roles_query]
+
+    return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
 
 
 # -------------------------------------------------------------------
@@ -353,6 +345,7 @@ def profile():
 @role_required('technician', 'admin')
 def inventory():
     if request.method == 'POST':
+        # read from the form
         item_id = request.form.get('item_id')
         new_qty = request.form.get('new_quantity')
         expiration_date = request.form.get('expiration_date') or None
@@ -362,6 +355,7 @@ def inventory():
             flash("Missing item_id or new_quantity.", "danger")
             return redirect(url_for('main.inventory'))
 
+        # call service layer
         response, status_code = update_inventory_item(
             item_id=item_id,
             new_quantity=int(new_qty),
@@ -376,17 +370,18 @@ def inventory():
 
         return redirect(url_for('main.inventory'))
 
+    # If GET, just fetch + display
     items = get_all_inventory_items()
     return render_template("inventory.html", items=items)
 
 
-# -------------------------------------------------------------------
-#                      Admin / Verification Page
-# -------------------------------------------------------------------
 @main.route('/verification', methods=['GET'])
 @login_required
 @role_required('admin')
 def verification():
+    """
+    Display all users pending verification.
+    """
     users = get_pending_verifications()
     return render_template("verification.html", users=users)
 
