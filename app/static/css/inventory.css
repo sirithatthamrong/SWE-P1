@@ -1,0 +1,71 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.inventory-header {
+    text-align: left;
+    font-size: 22px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl,
+.container-xxl {
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px;
+    background: #eef3f7;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    --bs-table-color-type: initial;
+    --bs-table-bg-type: initial;
+    --bs-table-color-state: initial;
+    --bs-table-bg-state: initial;
+    --bs-table-color: #2c3e50;
+    --bs-table-bg: ;
+    --bs-table-border-color: #dee2e6;
+    --bs-table-accent-bg: transparent;
+    --bs-table-striped-color: #212529;
+    --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+    --bs-table-active-color: #212529;
+    --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+    --bs-table-hover-color: #212529;
+    --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+}
+
+/* inventory.css */
+.btn-custom {
+    background-color: #74a9e3; /* Default button color */
+    color: white; /* White text */
+    border: none; /* Remove border */
+}
+
+.btn-custom:hover {
+    background-color: #0056b3 !important;
+    color: white;
+}
+
+.table {
+    width: 100%;
+
+}
+
+.table thead {
+    background-color: #c9cbef;
+    /*color: #7e71b5;*/
+}
+
+.inventory-header {
+    text-align: left;
+}
