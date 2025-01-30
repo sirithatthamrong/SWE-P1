@@ -38,12 +38,24 @@ def signup_user(username, email, password, role):
         return False
 
     try:
-        query = text(
-            "INSERT INTO Users (username, email, password, role) VALUES (:username, :email, :password, :role)"
-        )
-        db.session.execute(query, {'username': username, 'email': email, 'password': password, 'role': role})
+        # If the role is not 'user', request verification
+        requested_role = role if role != "user" else None
+        actual_role = "user"  # Default role
+
+        query = text("""
+            INSERT INTO Users (username, email, password, role, requested_role)
+            VALUES (:username, :email, :password, :role, :requested_role)
+        """)
+        db.session.execute(query, {
+            'username': username,
+            'email': email,
+            'password': password,
+            'role': actual_role,
+            'requested_role': requested_role
+        })
         db.session.commit()
-        flash("Signup successful! Please log in.", "success")
+
+        flash("Signup successful! If you requested a role, an admin will verify it.", "success")
         return True
     except Exception as e:
         db.session.rollback()

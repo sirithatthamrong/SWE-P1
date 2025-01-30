@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}User Verification{% endblock %}
+
+{% block content %}
+<div class="verification-container">
+    <h2>User Verification</h2>
+
+    <table class="verification-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Requested Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.requested_role }}</td>
+                <td class="action-buttons">
+                    <form action="{{ url_for('main.approve_user', user_id=user.user_id) }}" method="POST">
+                        <button type="submit" class="approve-btn">✔ Approve</button>
+                    </form>
+                    <form action="{{ url_for('main.reject_user', user_id=user.user_id) }}" method="POST">
+                        <button type="submit" class="reject-btn">✖ Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Link CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/verification.css') }}">
+{% endblock %}

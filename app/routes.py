@@ -39,6 +39,7 @@ from app.services.booking_service import (
     get_upcoming_bookings
 )
 from app.services.calendar_service import fetch_calendar_data
+from app.services.verification_service import get_pending_verifications, approve_verification, reject_verification
 
 main = Blueprint('main', __name__)
 
@@ -98,7 +99,7 @@ def logout():
 # -------------------------------------------------------------------
 @main.route('/tasks', methods=['GET', 'POST'])
 @login_required
-def tasks_page():
+def tasks():
     user_id = session.get('user_id')
     if not user_id:
         return "User not found in session", 401
@@ -110,7 +111,7 @@ def tasks_page():
             flash("Task created successfully!", "success")
         else:
             flash(response["error"], "danger")
-        return redirect(url_for('main.tasks_page'))
+        return redirect(url_for('main.tasks'))
 
     active_tab = request.args.get('tab', 'my-tasks')
 
@@ -148,7 +149,7 @@ def accept_task_route(task_id):
     else:
         flash(response["error"], "danger")
 
-    return redirect(url_for('main.tasks_page', tab=next_tab))
+    return redirect(url_for('main.tasks', tab=next_tab))
 
 
 @main.route('/tasks/<int:task_id>/complete', methods=['POST'])
@@ -163,7 +164,7 @@ def complete_task_route(task_id):
     else:
         flash(response["error"], "danger")
 
-    return redirect(url_for('main.tasks_page', tab=next_tab))
+    return redirect(url_for('main.tasks', tab=next_tab))
 
 
 @main.route('/tasks/<int:task_id>/delete', methods=['POST'])
@@ -194,7 +195,7 @@ def delete_task_route(task_id):
         db.session.rollback()
         flash(str(e), "danger")
 
-    return redirect(url_for('main.tasks_page', tab=next_tab))
+    return redirect(url_for('main.tasks', tab=next_tab))
 
 
 # -------------------------------------------------------------------
@@ -333,8 +334,7 @@ def profile():
 @main.route('/inventory', methods=['GET', 'POST'])
 @login_required
 @role_required('technician', 'admin')
-
-def inventory_page():
+def inventory():
     if request.method == 'POST':
         # read from the form
         item_id = request.form.get('item_id')
@@ -344,7 +344,7 @@ def inventory_page():
 
         if not item_id or not new_qty:
             flash("Missing item_id or new_quantity.", "danger")
-            return redirect(url_for('main.inventory_page'))
+            return redirect(url_for('main.inventory'))
 
         # call service layer
         response, status_code = update_inventory_item(
@@ -359,8 +359,39 @@ def inventory_page():
         else:
             flash(response.get("error"), "danger")
 
-        return redirect(url_for('main.inventory_page'))
+        return redirect(url_for('main.inventory'))
 
     # If GET, just fetch + display
     items = get_all_inventory_items()
     return render_template("inventory.html", items=items)
+
+
+@main.route('/verification', methods=['GET'])
+@login_required
+@role_required('admin')
+def verification():
+    """
+    Display all users pending verification.
+    """
+    users = get_pending_verifications()
+    return render_template("verification.html", users=users)
+
+
+@main.route('/verification/approve/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def approve_user(user_id):
+    response, status_code = approve_verification(user_id)
+    flash(response["message"] if "message" in response else response["error"],
+          "success" if status_code == 200 else "danger")
+    return redirect(url_for('main.verification'))
+
+
+@main.route('/verification/reject/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def reject_user(user_id):
+    response, status_code = reject_verification(user_id)
+    flash(response["message"] if "message" in response else response["error"],
+          "success" if status_code == 200 else "danger")
+    return redirect(url_for('main.verification'))
