@@ -7,15 +7,19 @@ def get_pending_verifications():
     Fetch users who have requested a role upgrade but are pending verification.
     """
     query = text("""
-        SELECT user_id, username, email, requested_role
+        SELECT user_id, username, email, requested_role, created_at
         FROM Users
         WHERE role = 'user' AND requested_role IS NOT NULL
     """)
     result = db.session.execute(query).fetchall()
 
-    return [{"user_id": row.user_id, "username": row.username, "email": row.email, "requested_role": row.requested_role}
-            for row in result]
-
+    return [{
+        "user_id": row.user_id,
+        "username": row.username,
+        "email": row.email,
+        "requested_role": row.requested_role,
+        "created_at": row.created_at.strftime('%Y-%m-%d')  # Format datetime
+    } for row in result]
 
 def approve_verification(user_id):
     """

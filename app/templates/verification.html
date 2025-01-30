@@ -2,38 +2,88 @@
 {% block title %}User Verification{% endblock %}
 
 {% block content %}
-<div class="verification-container">
-    <h2>User Verification</h2>
+    <div class="main-content">
+        <div class="verification-container">
+            <h2 class="verification-header">Pending Verifications</h2>
+            <div class="status-indicator">Showing {{ users|length }} pending requests</div>
 
-    <table class="verification-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Requested Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.requested_role }}</td>
-                <td class="action-buttons">
-                    <form action="{{ url_for('main.approve_user', user_id=user.user_id) }}" method="POST">
-                        <button type="submit" class="approve-btn">✔ Approve</button>
-                    </form>
-                    <form action="{{ url_for('main.reject_user', user_id=user.user_id) }}" method="POST">
-                        <button type="submit" class="reject-btn">✖ Reject</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+            <div class="main-container">
+                <!-- Filter Container -->
+                <div class="filters">
+                    <h3>Filters</h3>
 
-<!-- Link CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/verification.css') }}">
+                    <div class="filter-section">
+                        <label>Role:</label>
+                        <div><input type="checkbox" class="filter-role" value="technician" checked> Technician</div>
+                        <div><input type="checkbox" class="filter-role" value="researcher" checked> Researcher</div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label>Creation Date:</label>
+                        <input type="date" id="filter-creation-date">
+                    </div>
+
+                    <button class="filter-btn" onclick="applyVerificationFilters()">Apply Filters</button>
+                </div>
+
+                <!-- Verification Table -->
+                <table class="verification-table">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Requested Role</th>
+                        <th>Requested Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr data-role="{{ user.requested_role }}" data-creation-date="{{ user.created_at }}">
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.requested_role }}</td>
+                            <td>{{ user.created_at }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <form action="{{ url_for('main.approve_user', user_id=user.user_id) }}"
+                                          method="POST">
+                                        <button type="submit" class="btn-approve">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('main.reject_user', user_id=user.user_id) }}"
+                                          method="POST">
+                                        <button type="submit" class="btn-reject">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function applyVerificationFilters() {
+            const selectedRoles = Array.from(document.querySelectorAll('.filter-role:checked')).map(cb => cb.value.toLowerCase());
+            const selectedDate = document.getElementById('filter-creation-date').value;
+
+            document.querySelectorAll('.verification-table tbody tr').forEach(row => {
+                const role = row.dataset.role.toLowerCase();
+                const creationDate = row.dataset.creationDate;
+
+                const roleMatch = selectedRoles.length === 0 || selectedRoles.includes(role);
+                const dateMatch = !selectedDate || creationDate === selectedDate;
+
+                row.style.display = (roleMatch && dateMatch) ? '' : 'none';
+            });
+        }
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verification.css') }}">
 {% endblock %}
