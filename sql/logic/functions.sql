@@ -304,3 +304,22 @@ BEGIN
         t.due_date ASC;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION request_role_verification(
+    p_user_id INT,
+    p_requested_role VARCHAR
+) RETURNS VOID AS
+$$
+BEGIN
+    -- Only allow role requests for 'technician' or 'researcher'
+    IF p_requested_role NOT IN ('technician', 'researcher') THEN
+        RAISE EXCEPTION 'Invalid role request!';
+    END IF;
+
+    -- Update the user with the requested role
+    UPDATE Users
+    SET requested_role = p_requested_role
+    WHERE user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
