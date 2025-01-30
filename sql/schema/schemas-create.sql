@@ -100,15 +100,14 @@ CREATE TABLE InventoryCategories
 
 CREATE TABLE InventoryItems
 (
-    item_id         SERIAL PRIMARY KEY,
-    category_id     INTEGER      NOT NULL,
-    name            VARCHAR(100) NOT NULL,
-    quantity        INTEGER      NOT NULL CHECK ( quantity >= 0 ),
-    reorder_level   INTEGER      NOT NULL CHECK ( reorder_level >= 0 ),
-    expiration_date DATE,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    supplier_id     INTEGER,
+    item_id       SERIAL PRIMARY KEY,
+    category_id   INTEGER      NOT NULL,
+    name          VARCHAR(100) NOT NULL,
+    reorder_level INTEGER      NOT NULL CHECK (reorder_level >= 0),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    supplier_id   INTEGER,
     FOREIGN KEY (category_id) REFERENCES InventoryCategories (category_id) ON DELETE CASCADE,
     FOREIGN KEY (supplier_id) REFERENCES Suppliers (supplier_id)
 );
@@ -210,5 +209,18 @@ CREATE TABLE TaskLogs
     performed_by INTEGER NOT NULL,
     FOREIGN KEY (task_id) REFERENCES Tasks (task_id) ON DELETE CASCADE,
     FOREIGN KEY (performed_by) REFERENCES Users (user_id)
+);
+
+CREATE TABLE InventoryBatches
+(
+    batch_id SERIAL PRIMARY KEY,
+    item_id  INTEGER NOT NULL REFERENCES InventoryItems(item_id),
+
+    quantity INTEGER NOT NULL CHECK (quantity >= 0),
+
+    -- For truly no-expiry items, store '9999-12-31'
+    expiration_date DATE NOT NULL DEFAULT '9999-12-31',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

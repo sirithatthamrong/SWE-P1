@@ -18,11 +18,14 @@
         <li><a href="{{ url_for('main.calendar') }}"><i class="fas fa-calendar"></i> <span>Calendar</span></a></li>
         <li><a href="{{ url_for('main.tasks_page') }}"><i class="fas fa-tasks"></i> <span>Tasks</span></a></li>
         <li><a href="{{ url_for('main.booking') }}"><i class="fas fa-book"></i> <span>Booking</span></a></li>
+        {% if session['user_role'] in ['technician', 'admin'] %}
+        <li><a href="{{ url_for('main.inventory_page') }}"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+        {% endif %}
+
         <li><a href="{{ url_for('main.profile') }}"><i class="fas fa-user"></i> <span>Profile</span></a></li>
         <li><a href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
     </ul>
 </div>
-
 
 <!-- Main Content -->
 <div class="main-content">

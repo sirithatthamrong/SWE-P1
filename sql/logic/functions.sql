@@ -132,6 +132,138 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_inventory(
+    p_item_id INTEGER,
+    p_new_quantity INTEGER,
+    p_performed_by INTEGER,
+    p_expiration_date DATE DEFAULT NULL
+)
+    RETURNS TEXT AS
+$$
+DECLARE
+    v_batch_id         INTEGER;
+    v_old_qty          INTEGER;
+    v_use_date         DATE;
+    v_total_qty        INTEGER;
+    v_reorder_level    INTEGER;
+    v_task_id          INTEGER;
+    -- For the supplier/task info:
+    v_item_name        VARCHAR;
+    v_supplier_name    VARCHAR;
+    v_supplier_contact TEXT;
+    v_task_type_id     INTEGER;
+BEGIN
+    -- Normalize expiration date
+    IF p_expiration_date IS NULL OR p_expiration_date = '9999-12-31' THEN
+        v_use_date := '9999-12-31';
+    ELSE
+        v_use_date := p_expiration_date;
+    END IF;
+
+    -- 1) Fetch item info (including reorder_level and supplier)
+    SELECT i.name, i.reorder_level, s.supplier_name, s.contact_info
+    INTO v_item_name, v_reorder_level, v_supplier_name, v_supplier_contact
+    FROM InventoryItems i
+             LEFT JOIN Suppliers s ON i.supplier_id = s.supplier_id
+    WHERE i.item_id = p_item_id
+    LIMIT 1;
+
+    -- If item not found, return an error
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Item ID % does not exist', p_item_id;
+    END IF;
+
+    -- 2) Ensure batch exists, then replace quantity
+    SELECT batch_id, quantity
+    INTO v_batch_id, v_old_qty
+    FROM InventoryBatches
+    WHERE item_id = p_item_id
+      AND expiration_date = v_use_date
+        FOR UPDATE;
+
+    IF FOUND THEN
+        -- Replace quantity instead of adding
+        UPDATE InventoryBatches
+        SET quantity = p_new_quantity
+        WHERE batch_id = v_batch_id;
+    ELSE
+        -- Insert new batch if not found
+        INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
+        VALUES (p_item_id, p_new_quantity, v_use_date)
+        RETURNING batch_id INTO v_batch_id;
+    END IF;
+
+    -- 3) Recalculate total quantity
+    SELECT COALESCE(SUM(quantity), 0)
+    INTO v_total_qty
+    FROM InventoryBatches
+    WHERE item_id = p_item_id;
+
+    -- 4) Log the restocking action
+    INSERT INTO InventoryLogs (item_id, action, quantity_change, performed_by, action_date)
+    VALUES (p_item_id, 'restocked', p_new_quantity, p_performed_by, CURRENT_TIMESTAMP);
+
+    -- 5) If stock falls below reorder level, create a "RESTOCK (item_name)" task if none exists
+    IF v_total_qty <= v_reorder_level THEN
+        -- Optional: If you only want to do this if the reorder_level is > 0,
+        -- you could add: IF v_reorder_level > 0 THEN ... END IF;
+
+        -- Check if we already have a pending/in-progress "RESTOCK (item name)" task
+        SELECT task_id
+        INTO v_task_id
+        FROM Tasks
+        WHERE task_name = 'RESTOCK - ' || v_item_name
+          AND status IN ('pending', 'in progress')
+        LIMIT 1;
+
+        IF v_task_id IS NULL THEN
+            -- Make sure we find the 'Restock' task_type_id
+            SELECT task_type_id
+            INTO v_task_type_id
+            FROM TaskTypes
+            WHERE task_name = 'Restock'
+            LIMIT 1;
+
+            IF v_task_type_id IS NULL THEN
+                RAISE EXCEPTION 'No TaskTypes row found for ''Restock''!';
+            END IF;
+
+            INSERT INTO Tasks (task_name,
+                               task_description,
+                               due_date,
+                               task_type_id,
+                               priority,
+                               created_by)
+            VALUES ('RESTOCK - ' || v_item_name,
+                    'Item "' || v_item_name || '" is below reorder level!'
+                        || ' Current qty: ' || v_total_qty
+                        || ', reorder level: ' || v_reorder_level
+                        || CASE
+                               WHEN v_supplier_name IS NOT NULL THEN
+                                   E'\nSupplier: ' || v_supplier_name
+                                       || E'\nContact: ' || v_supplier_contact
+                               ELSE
+                                   ''
+                        END,
+                    CURRENT_DATE + INTERVAL '1 day',
+                    v_task_type_id,
+                    'high',
+                    0 -- 0 can signify "system user"
+                   )
+            RETURNING task_id INTO v_task_id;
+
+            -- Assign task to all technicians
+            INSERT INTO TaskAssignments (task_id, user_id)
+            SELECT v_task_id, user_id
+            FROM Users
+            WHERE role = 'technician';
+        END IF;
+    END IF;
+
+    RETURN 'Inventory updated successfully';
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION get_tasks_for_user(p_user_id INT)
 RETURNS TABLE
         (
