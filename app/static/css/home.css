@@ -5,7 +5,7 @@ body {
     padding: 0;
 }
 
-/* Sidebar */
+/* Sidebar Container */
 .sidebar {
     width: 150px;
     background: #e7eff9;
@@ -18,15 +18,17 @@ body {
     top: 0;
     transition: width 0.3s ease-in-out;
     overflow: hidden;
-    align-items: center; /* Center elements */
+    /* Ensures top-nav is at the top and bottom-nav at the bottom */
+    justify-content: space-between;
+    align-items: center; /* Center items horizontally if you like */
 }
 
-/* Sidebar Collapsed */
+/* For smaller sidebar (collapsed) */
 .sidebar.hidden {
-    width: 70px; /* Icons remain visible */
+    width: 70px;
 }
 
-/* Sidebar Navigation */
+/* Both top-nav and bottom-nav can share the same styles */
 .sidebar .nav {
     list-style: none;
     padding: 0;
@@ -71,6 +73,11 @@ body {
 
 .sidebar.hidden .nav a {
     justify-content: center;
+}
+
+.bottom-nav {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
 }
 
 .menu-toggle {
