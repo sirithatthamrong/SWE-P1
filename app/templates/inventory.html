@@ -10,7 +10,7 @@
             <th>Item Name</th>
             <th>Category</th>
             <th>Total Qty</th>
-            <th>Reorder Level (Debug)</th>   {# <-- added this so you can see reorder_level #}
+            <th>Reorder Level (Debug)</th>
             <th>Expiry Status</th>
             <th>Enter Qty</th>
             <th>Expiry Date</th>
@@ -19,17 +19,10 @@
         </thead>
         <tbody>
         {% for data in items %}
-            {#
-              We rely on data["total_qty"] from your Python code (inventory_service.py),
-              which presumably sums the batch quantities already.
-              Let's store it in a local variable 'computed_qty' so we can use it in
-              the condition and also display it in the table.
-            #}
             {% set computed_qty = data.total_qty %}
             {% set reorder_level = data["item"]["reorder_level"] %}
 
             <tr>
-                {# 1) If total_qty < reorder_level, turn item name red #}
                 {% if computed_qty <= reorder_level %}
                     <td style="color:red;">{{ data["item"]["name"] }}</td>
                 {% else %}
@@ -38,10 +31,8 @@
 
                 <td>{{ data["item"]["category_name"] }}</td>
 
-                {# 2) Show the total quantity from your python data #}
                 <td>{{ computed_qty }}</td>
 
-                {# 3) Show reorder_level for debugging #}
                 <td>{{ reorder_level }}</td>
 
                 <td>
@@ -52,7 +43,6 @@
                     {% endif %}
                 </td>
 
-                {# A small form to allow updating/inserting a batch #}
                 <form action="{{ url_for('main.inventory_page') }}" method="POST">
                     <td>
                         <input type="number"
@@ -78,14 +68,12 @@
                 </form>
             </tr>
 
-            {# If there are any batches, list them in a second row #}
             {% if data["batches"] %}
                 <tr style="background:#fafafa;">
                     <td colspan="8" style="font-size:0.9em;">
                         <strong>Batches:</strong>
                         <ul style="margin:0; padding-left:1.5em;">
                             {% for batch in data["batches"] %}
-                                {# again, take the first 10 chars #}
                                 {% set b_str = (batch["expiration_date"]|string)[:10] %}
 
                                 <li>
