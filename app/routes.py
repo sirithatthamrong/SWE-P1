@@ -66,7 +66,13 @@ def health_check():
 @main.route('/')
 @login_required
 def home():
-    return render_template('home.html')
+    # Get username from session or redirect to login
+    username = session.get('username')
+    if not username:
+        flash("Please log in first", "warning")
+        return redirect(url_for('main.login'))
+
+    return render_template('home.html', username=username)
 
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -74,8 +80,20 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if login_user(username, password):
+
+        # Fetch user from database
+        user = db.session.execute(
+            text("SELECT * FROM Users WHERE username = :username"),
+            {"username": username}
+        ).fetchone()
+
+        if user and login_user(username, password):
+            # Store both user_id and username in session
+            session['user_id'] = user.user_id
+            session['username'] = user.username
             return redirect(url_for('main.home'))
+        else:
+            flash("Invalid credentials", "danger")
     return render_template('login.html')
 
 

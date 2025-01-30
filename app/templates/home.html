@@ -1,42 +1,56 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Greeting Section -->
-    <h2 class="mb-4">
-        Welcome, {{ session['username'] }}!
-    </h2>
+    <div class="container mt-4">
+        <!-- Greeting Section -->
+        <h2 class="mb-4">
+            Welcome, {{ username }}!
+        </h2>
 
-    <div class="welcome-container">
-        <img
-            src="{{ url_for('static', filename='images/piti.png') }}"
-            alt="User"
-            class="user-image"
-        >
-        <div class="thought-bubble">
-            <p>Let’s start working!</p>
-        </div>
-    </div>
-
-    <!-- Additional content or quick-links/call-to-actions below -->
-    <p class="mt-4">Here’s a quick overview of what you can do today:</p>
-
-    <div class="row mt-4">
-        <!-- Example Card: Tasks -->
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-tasks fa-2x mb-3"></i>
-                    <h5 class="card-title">My Tasks</h5>
-                    <p class="card-text">View and manage your tasks.</p>
-                    <a href="{{ url_for('main.tasks') }}" class="btn btn-primary">
-                        Go to Tasks
-                    </a>
-                </div>
+        <div class="welcome-container">
+            <img
+                    src="{{ url_for('static', filename='images/piti.png') }}"
+                    alt="User"
+                    class="user-image"
+            >
+            <div class="thought-bubble">
+                <p>Let’s start working!</p>
             </div>
         </div>
 
-        <!-- Add more cards for Calendar, Booking, etc., if you'd like -->
+        <!-- Quick Links Section -->
+        <p class="mt-4">Here’s a quick overview of what you can do today:</p>
+
+        <div class="row mt-4">
+            <!-- Tasks Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <i class="fas fa-tasks"></i>
+                    <h5>My Tasks</h5>
+                    <p>View and manage your tasks.</p>
+                    <a href="{{ url_for('main.tasks') }}">Go to Tasks</a>
+                </div>
+            </div>
+
+            <!-- Calendar Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h5>Calendar</h5>
+                    <p>Check your schedule and events.</p>
+                    <a href="{{ url_for('main.calendar') }}">Go to Calendar</a>
+                </div>
+            </div>
+
+            <!-- Booking Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <i class="fas fa-bookmark"></i>
+                    <h5>Bookings</h5>
+                    <p>Manage your bookings and reservations.</p>
+                    <a href="{{ url_for('main.booking') }}">Go to Bookings</a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 {% endblock %}

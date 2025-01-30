@@ -1,6 +1,6 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f4f7fc;
     margin: 0;
     padding: 0;
 }
@@ -18,17 +18,14 @@ body {
     top: 0;
     transition: width 0.3s ease-in-out;
     overflow: hidden;
-    /* Ensures top-nav is at the top and bottom-nav at the bottom */
     justify-content: space-between;
-    align-items: center; /* Center items horizontally if you like */
+    align-items: center;
 }
 
-/* For smaller sidebar (collapsed) */
 .sidebar.hidden {
     width: 70px;
 }
 
-/* Both top-nav and bottom-nav can share the same styles */
 .sidebar .nav {
     list-style: none;
     padding: 0;
@@ -36,16 +33,14 @@ body {
     width: 100%;
 }
 
-/* Sidebar Items */
 .sidebar .nav li {
     margin: 10px 0;
     width: 100%;
 }
 
-/* Sidebar Links */
 .sidebar .nav a {
     text-decoration: none;
-    color: #333;
+    color: #2c3e50;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -54,19 +49,16 @@ body {
     transition: background 0.3s ease-in-out;
 }
 
-/* Hover effect */
 .sidebar .nav a:hover {
     background: #d1e3f8;
 }
 
-/* Sidebar Icons */
 .sidebar .nav a i {
     font-size: 20px;
     margin-right: 12px;
     transition: margin-right 0.3s ease-in-out;
 }
 
-/* When sidebar is collapsed, hide text */
 .sidebar.hidden .nav a span {
     display: none;
 }
@@ -100,7 +92,6 @@ body {
     flex-direction: column;
 }
 
-/* When sidebar is collapsed */
 .main-content.expanded {
     margin-left: 60px;
 }
@@ -110,6 +101,10 @@ body {
     display: flex;
     align-items: center;
     margin-top: 40px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .user-image {
@@ -118,20 +113,20 @@ body {
     border-radius: 50%;
 }
 
-/* Thought Bubble */
 .thought-bubble {
-    background: #ddd;
+    background: #eef3f7;
     padding: 20px;
     border-radius: 20px;
     margin-left: 20px;
     position: relative;
+    color: #2c3e50;
 }
 
 .thought-bubble::before {
     content: "";
     width: 20px;
     height: 20px;
-    background: #ddd;
+    background: #eef3f7;
     position: absolute;
     left: -10px;
     top: 50%;
@@ -142,9 +137,54 @@ body {
     content: "";
     width: 10px;
     height: 10px;
-    background: #ddd;
+    background: #eef3f7;
     position: absolute;
     left: -20px;
     top: 60%;
     border-radius: 50%;
+}
+
+/* Cards Section */
+.card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card i {
+    font-size: 2rem;
+    color: #7e71b5;
+    margin-bottom: 15px;
+}
+
+.card h5 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.card a {
+    background: #7e71b5;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.3s ease-in-out;
+}
+
+.card a:hover {
+    background: #5a4d8a;
 }
