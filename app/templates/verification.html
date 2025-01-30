@@ -4,8 +4,10 @@
 {% block content %}
     <div class="main-content">
         <div class="verification-container">
-            <h2 class="verification-header">Pending Verifications</h2>
-            <div class="status-indicator">Showing {{ users|length }} pending requests</div>
+            <div class="header-section">
+                <h2 class="verification-header">Pending Verifications</h2>
+                <div class="status-indicator">Showing {{ users|length }} pending requests</div>
+            </div>
 
             <div class="main-container">
                 <!-- Filter Container -->
@@ -13,14 +15,26 @@
                     <h3>Filters</h3>
 
                     <div class="filter-section">
-                        <label>Role:</label>
-                        <div><input type="checkbox" class="filter-role" value="technician" checked> Technician</div>
-                        <div><input type="checkbox" class="filter-role" value="researcher" checked> Researcher</div>
+                        <div class="form-group">
+                            <label>Role:</label>
+                            <div class="checkbox-group">
+                                <label class="filter-option">
+                                    <input type="checkbox" class="filter-role" value="technician" checked>
+                                    Technician
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" class="filter-role" value="researcher" checked>
+                                    Researcher
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="filter-section">
-                        <label>Creation Date:</label>
-                        <input type="date" id="filter-creation-date">
+                        <div class="form-group">
+                            <label>Requested Date:</label>
+                            <input type="date" id="filter-creation-date" class="form-control">
+                        </div>
                     </div>
 
                     <button class="filter-btn" onclick="applyVerificationFilters()">Apply Filters</button>
@@ -29,16 +43,16 @@
                 <!-- Verification Table -->
                 <table class="verification-table">
                     <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Requested Role</th>
-                        <th>Requested Date</th>
-                        <th>Actions</th>
-                    </tr>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Requested Role</th>
+                            <th>Requested Date</th>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {% for user in users %}
+                        {% for user in users %}
                         <tr data-role="{{ user.requested_role }}" data-creation-date="{{ user.created_at }}">
                             <td>{{ user.username }}</td>
                             <td>{{ user.email }}</td>
@@ -46,14 +60,12 @@
                             <td>{{ user.created_at }}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <form action="{{ url_for('main.approve_user', user_id=user.user_id) }}"
-                                          method="POST">
+                                    <form action="{{ url_for('main.approve_user', user_id=user.user_id) }}" method="POST">
                                         <button type="submit" class="btn-approve">
                                             <i class="fas fa-check"></i> Approve
                                         </button>
                                     </form>
-                                    <form action="{{ url_for('main.reject_user', user_id=user.user_id) }}"
-                                          method="POST">
+                                    <form action="{{ url_for('main.reject_user', user_id=user.user_id) }}" method="POST">
                                         <button type="submit" class="btn-reject">
                                             <i class="fas fa-times"></i> Reject
                                         </button>
@@ -61,7 +73,7 @@
                                 </div>
                             </td>
                         </tr>
-                    {% endfor %}
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -69,6 +81,27 @@
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const approveButtons = document.querySelectorAll(".approve-btn");
+            const rejectButtons = document.querySelectorAll(".reject-btn");
+
+            approveButtons.forEach(button => {
+                button.addEventListener("click", function (event) {
+                    if (!confirm("Are you sure you want to approve this user?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+            rejectButtons.forEach(button => {
+                button.addEventListener("click", function (event) {
+                    if (!confirm("Are you sure you want to reject this user?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+
         function applyVerificationFilters() {
             const selectedRoles = Array.from(document.querySelectorAll('.filter-role:checked')).map(cb => cb.value.toLowerCase());
             const selectedDate = document.getElementById('filter-creation-date').value;
@@ -78,7 +111,7 @@
                 const creationDate = row.dataset.creationDate;
 
                 const roleMatch = selectedRoles.length === 0 || selectedRoles.includes(role);
-                const dateMatch = !selectedDate || creationDate === selectedDate;
+                const dateMatch = !selectedDate || creationDate.includes(selectedDate);
 
                 row.style.display = (roleMatch && dateMatch) ? '' : 'none';
             });
