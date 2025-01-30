@@ -16,6 +16,18 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapped_function(*args, **kwargs):
+            user_role = session.get('user_role')
+            print(f"DEBUG: User role in session: {user_role}")  # Debug log
+            if user_role not in roles:
+                flash("You do not have permission to access this page.", "danger")
+                return redirect(url_for('main.home'))  # Redirect to home page or another safe page
+            return f(*args, **kwargs)
+        return wrapped_function
+    return decorator
 
 def signup_user(username, email, password, role):
     query = text("SELECT username FROM Users WHERE username = :username")
@@ -41,15 +53,16 @@ def signup_user(username, email, password, role):
 
 def login_user(username, password):
     query = text(
-        "SELECT user_id, password FROM Users WHERE username = :username"
+        "SELECT user_id, password, role FROM Users WHERE username = :username"
     )
     result = db.session.execute(query, {'username': username}).fetchone()
 
     if result:
-        user_id, stored_password = result
+        user_id, stored_password, user_role = result
 
         if password == stored_password:
             session['user_id'] = user_id
+            session['user_role'] = user_role
             flash("Login successful!", "success")
             return True
         else:

@@ -11,7 +11,7 @@ from flask import (
 from sqlalchemy import text
 from app import db
 from datetime import datetime
-from app.services.auth_service import signup_user, login_user, login_required
+from app.services.auth_service import signup_user, login_user, login_required, role_required
 from app.services.tasks_service import (
     get_tasks_for_user,
     get_tasks_created_by_user,
@@ -19,6 +19,12 @@ from app.services.tasks_service import (
     accept_task,
     complete_task
 )
+
+from app.services.inventory_service import (
+    get_all_inventory_items,
+    update_inventory_item
+)
+
 from app.services.booking_service import (
     get_lab_zones,
     get_experiment_types,
@@ -35,7 +41,6 @@ from app.services.booking_service import (
 from app.services.calendar_service import fetch_calendar_data
 
 main = Blueprint('main', __name__)
-
 
 # -------------------------------------------------------------------
 #                      Health Check
@@ -125,6 +130,7 @@ def tasks_page():
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
+
         active_tab=active_tab,
         valid_user_ids=valid_user_ids
     )
@@ -319,3 +325,42 @@ def profile():
     roles = [row.role for row in roles_query]
 
     return render_template('profile.html', user=user, user_id=user_id, users=users, roles=roles)
+
+
+# -------------------------------------------------------------------
+#                      Technician / Inventory Page
+# -------------------------------------------------------------------
+@main.route('/inventory', methods=['GET', 'POST'])
+@login_required
+@role_required('technician', 'admin')
+
+def inventory_page():
+    if request.method == 'POST':
+        # read from the form
+        item_id = request.form.get('item_id')
+        new_qty = request.form.get('new_quantity')
+        expiration_date = request.form.get('expiration_date') or None
+        performed_by = session['user_id']
+
+        if not item_id or not new_qty:
+            flash("Missing item_id or new_quantity.", "danger")
+            return redirect(url_for('main.inventory_page'))
+
+        # call service layer
+        response, status_code = update_inventory_item(
+            item_id=item_id,
+            new_quantity=int(new_qty),
+            performed_by=performed_by,
+            expiration_date=expiration_date
+        )
+
+        if status_code == 200:
+            flash("Inventory updated successfully!", "success")
+        else:
+            flash(response.get("error"), "danger")
+
+        return redirect(url_for('main.inventory_page'))
+
+    # If GET, just fetch + display
+    items = get_all_inventory_items()
+    return render_template("inventory.html", items=items)
