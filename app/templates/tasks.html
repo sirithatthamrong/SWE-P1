@@ -6,7 +6,6 @@
     <!-- store the active_tab on the body or a wrapper container -->
     <body data-active-tab="{{ active_tab|default('my-tasks') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
     <script defer src="{{ url_for('static', filename='js/tasks.js') }}"></script>
 
     <div class="overdue-tasks-section">
@@ -251,12 +250,9 @@
         </div>
     </body>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let today = new Date().toISOString().split("T")[0];
-            document.getElementById("due_date").setAttribute("min", today);
-        });
-    </script>
-    <script>
         const validUserIds = {{ valid_user_ids | tojson }};
     </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/filter_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
 {% endblock %}

@@ -39,9 +39,14 @@ from app.services.booking_service import (
     get_upcoming_bookings
 )
 from app.services.calendar_service import fetch_calendar_data
-from app.services.verification_service import get_pending_verifications, approve_verification, reject_verification
+from app.services.verification_service import (
+    get_pending_verifications,
+    approve_verification,
+    reject_verification
+)
 
 main = Blueprint('main', __name__)
+
 
 # -------------------------------------------------------------------
 #                      Health Check
@@ -61,7 +66,13 @@ def health_check():
 @main.route('/')
 @login_required
 def home():
-    return render_template('home.html')
+    # Get username from session or redirect to login
+    username = session.get('username')
+    if not username:
+        flash("Please log in first", "warning")
+        return redirect(url_for('main.login'))
+
+    return render_template('home.html', username=username)
 
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -69,8 +80,20 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if login_user(username, password):
+
+        # Fetch user from database
+        user = db.session.execute(
+            text("SELECT * FROM Users WHERE username = :username"),
+            {"username": username}
+        ).fetchone()
+
+        if user and login_user(username, password):
+            # Store both user_id and username in session
+            session['user_id'] = user.user_id
+            session['username'] = user.username
             return redirect(url_for('main.home'))
+        else:
+            flash("Invalid credentials", "danger")
     return render_template('login.html')
 
 
@@ -131,7 +154,6 @@ def tasks():
         tasks=tasks_assigned,
         my_created_tasks=my_created_tasks,
         task_types=task_types,
-
         active_tab=active_tab,
         valid_user_ids=valid_user_ids
     )
@@ -158,7 +180,6 @@ def complete_task_route(task_id):
     next_tab = request.args.get('tab', 'completed')
 
     response, status_code = complete_task(task_id)
-
     if status_code == 200:
         flash("Task completed!", "success")
     else:
@@ -213,11 +234,17 @@ def booking():
         start_time = request.form.get('start_time')
         end_time = request.form.get('end_time')
 
-        available_rooms = get_available_rooms(lab_zone_id, experiment_id, date, start_time, end_time)
-
-        return jsonify(
-            {"available_rooms": [{"lab_room_id": row.lab_room_id, "name": row.name} for row in available_rooms]}
+        available_rooms = get_available_rooms(
+            lab_zone_id, experiment_id, date,
+            start_time, end_time
         )
+
+        return jsonify({
+            "available_rooms": [
+                {"lab_room_id": row.lab_room_id, "name": row.name}
+                for row in available_rooms
+            ]
+        })
 
     upcoming_bookings = get_upcoming_bookings(session.get('user_id'))
 
@@ -245,7 +272,7 @@ def cancel_booking(reservation_id):
 @main.route('/booking/room/<int:room_id>', methods=['GET', 'POST'])
 @login_required
 def book_room(room_id):
-    date = request.args.get('date', None)
+    date = request.args.get('date')
 
     if date:
         today = datetime.now().date()
@@ -382,8 +409,10 @@ def verification():
 @role_required('admin')
 def approve_user(user_id):
     response, status_code = approve_verification(user_id)
-    flash(response["message"] if "message" in response else response["error"],
-          "success" if status_code == 200 else "danger")
+    flash(
+        response.get("message", response.get("error")),
+        "success" if status_code == 200 else "danger"
+    )
     return redirect(url_for('main.verification'))
 
 
@@ -392,6 +421,8 @@ def approve_user(user_id):
 @role_required('admin')
 def reject_user(user_id):
     response, status_code = reject_verification(user_id)
-    flash(response["message"] if "message" in response else response["error"],
-          "success" if status_code == 200 else "danger")
+    flash(
+        response.get("message", response.get("error")),
+        "success" if status_code == 200 else "danger"
+    )
     return redirect(url_for('main.verification'))
