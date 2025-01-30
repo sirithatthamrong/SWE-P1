@@ -1,9 +1,3 @@
-# app/services/inventory_service.py
-
-from datetime import datetime
-from sqlalchemy import text
-from app import db
-
 from datetime import datetime
 from sqlalchemy import text
 from app import db
@@ -96,7 +90,6 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
     Helper function that inserts a new "low stock" task in the 'Tasks' table,
     assigned to all technicians.
     """
-    # 1) Fetch all technicians
     technicians_sql = text("""
         SELECT user_id
         FROM Users
@@ -106,7 +99,6 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
     if not tech_rows:
         return  # no technicians to assign the task
 
-    # 2) Insert the task in 'Tasks'
     task_sql = text("""
         INSERT INTO Tasks (
             task_name, task_description, due_date,
@@ -129,7 +121,6 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
     })
     new_task_id = res.fetchone()[0]
 
-    # 3) Insert into TaskAssignments for each technician
     assign_sql = text("""
         INSERT INTO TaskAssignments (task_id, user_id)
         VALUES (:tid, :uid)
