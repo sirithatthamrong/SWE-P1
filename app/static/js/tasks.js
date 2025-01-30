@@ -22,6 +22,7 @@ function showTaskModal(taskId) {
     const taskDueDate = taskCard.dataset.dueDate;
     const taskPriority = taskCard.dataset.priority;
     const taskStatus = taskCard.dataset.status;
+    const taskCreator = taskCard.dataset.creatorName;
     const isOwned = (taskCard.dataset.owned === 'true');
 
     // Fill modal info
@@ -29,6 +30,7 @@ function showTaskModal(taskId) {
     document.getElementById('modal-task-description').textContent = "Description: " + taskDesc;
     document.getElementById('modal-task-due-date').textContent = taskDueDate;
     document.getElementById('modal-task-priority').textContent = taskPriority;
+    document.getElementById('modal-task-creator').textContent = taskCreator;
 
     // Accept/Complete/Delete forms
     const acceptForm = document.getElementById('acceptForm');
@@ -118,9 +120,27 @@ function applyFilters() {
         let dueDate = card.getAttribute("data-due-date");
 
         let show = (!selectedTaskTypes.length || selectedTaskTypes.includes(taskType)) &&
-                   (!selectedPriorities.length || selectedPriorities.includes(priority)) &&
-                   (!selectedDueDate || dueDate < selectedDueDate); // Change filter logic
+            (!selectedPriorities.length || selectedPriorities.includes(priority)) &&
+            (!selectedDueDate || dueDate < selectedDueDate); // Change filter logic
 
         card.style.display = show ? "block" : "none";
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector(".create-task-form");
+
+    form.addEventListener("submit", function (event) {
+        const assignedToInput = document.getElementById("assigned_to");
+        const assignedUserIds = assignedToInput.value.split(";").map(id => id.trim());
+
+        // Check if all IDs exist in validUserIds
+        for (const userId of assignedUserIds) {
+            if (!validUserIds.includes(parseInt(userId))) {
+                alert(`Error: User ID ${userId} does not exist.`);
+                event.preventDefault();  // Prevent form submission
+                return;
+            }
+        }
+    });
+});

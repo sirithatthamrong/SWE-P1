@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("date").setAttribute("min", today);
 });
 
-let roomsPerPage = 15;
+let roomsPerPage = 16;
 let currentPage = 1;
 let totalRooms = [];
 let totalPages = 1;
@@ -86,17 +86,27 @@ function closeModal() {
 }
 
 function cancelBooking() {
-    if (!cancelId) return;
+    if (!cancelId) {
+        console.error("No cancelId found.");
+        return;
+    }
+
+    console.log("Canceling booking with ID:", cancelId); // Debugging
 
     fetch(`/booking/cancel/${cancelId}`, {
-        method: "POST"
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            console.log("Booking canceled successfully!"); // Debugging
             document.getElementById(`booking-${cancelId}`).remove();
             alert("Booking canceled successfully!");
         } else {
+            console.error("Error:", data.error);
             alert("Failed to cancel booking.");
         }
         closeModal();

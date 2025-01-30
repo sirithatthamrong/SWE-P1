@@ -7,7 +7,7 @@ EXECUTE FUNCTION prevent_double_booking();
 
 DROP TRIGGER IF EXISTS auto_archive_old_reservations ON RoomReservations;
 CREATE TRIGGER auto_archive_old_reservations
-    BEFORE INSERT OR UPDATE
+    AFTER INSERT OR UPDATE
     ON RoomReservations
     FOR EACH ROW
 EXECUTE FUNCTION archive_old_reservations();
