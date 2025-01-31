@@ -32,7 +32,7 @@
             {% for data in items %}
                 {% set computed_qty = data.total_qty %}
                 {% set reorder_level = data["item"]["reorder_level"] %}
-              
+
                 <tr class="{% if computed_qty <= reorder_level %}table-danger{% endif %}">
                     <td class="{% if computed_qty <= reorder_level %}text-danger fw-bold{% endif %}">
                         {{ data["item"]["name"] }}
