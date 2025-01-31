@@ -8,7 +8,6 @@ User**—has **tailored access to the system**, maintaining **security, accounta
 
 🚀 **Live Deployment**: [LabSync on Render](https://labsync-rd2f.onrender.com)
 
----
 
 ## **📌 Table of Contents**
 
@@ -19,9 +18,8 @@ User**—has **tailored access to the system**, maintaining **security, accounta
 5. [Technology Stack](#technology-stack)
 6. [Deployment Guide](#deployment-guide)
 
----
 
-## **📥 Installation Guide**
+## **Installation Guide**
 
 ### **1️⃣ Install Dependencies**
 
@@ -39,9 +37,7 @@ flask run --host=0.0.0.0 --port=10000
 
 Then, navigate to **[`http://localhost:10000/`](http://localhost:10000/)** in your web browser.
 
----
-
-## **🛠️ Usage Guide**
+## **Usage Guide**
 
 ### **1️⃣ Logging In**
 
@@ -62,9 +58,8 @@ credentials:
 - New users can register for an account, but if they choose **a role other than "User" (e.g., Technician, Researcher,
   Admin)**, their account **must be approved by an Admin** before they can log in.
 
----
 
-## **🚀 Features**
+## **Features**
 
 ### **1️⃣ Booking System**
 
@@ -88,12 +83,11 @@ credentials:
 
 ### **4️⃣ User Profile Management**
 
-- **View Personal & Other User Details**
-- **Edit Profile** for a personalized experience.
+- **View Personal & Other User Details**: Users can view their own and others' profiles.
 
 ### **5️⃣ Inventory Management (Technician Only)**
 
-- **Update Stock Levels**
+- **Update Stock Levels**: Add, remove, or update stock levels for equipment, chemicals, and consumables.
 - **Automated Restocking Alerts** when stock falls below reorder levels.
 
 ### **6️⃣ Verification System (Admin Only)**
@@ -101,9 +95,7 @@ credentials:
 - **Approval Process**: Admins must approve non-user accounts before activation.
 - **User Management**: Admins can monitor and manage registered users.
 
----
-
-## **📂 Project Structure**
+## **Project Structure**
 
 LabSync follows a **modular and organized project structure**, making it easy to **extend, debug, and maintain**.
 
@@ -131,9 +123,7 @@ SWE-P1/                    # Project Root
 │── README.md              # Documentation
 ```
 
----
-
-## **🛠️ Technology Stack**
+## **Technology Stack**
 
 LabSync is built using **modern technologies** to ensure **scalability, performance, and maintainability**.
 
@@ -147,5 +137,3 @@ LabSync is built using **modern technologies** to ensure **scalability, performa
 | **Database**      | [PostgreSQL](https://www.postgresql.org/) | Relational database for structured data storage. |
 | **Authentication** | Flask-Login & Flask-SQLAlchemy | Secure user authentication and database ORM. |
 | **Deployment**    | [Render](https://render.com/) | **Cloud-based hosting platform** for automatic deployments. |
-| **Version Control** | Git & GitHub | Manages source code and collaboration. |
-
