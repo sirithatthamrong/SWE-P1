@@ -67,6 +67,16 @@ body {
     justify-content: center;
 }
 
+/* Active Sidebar Link */
+.sidebar .nav a.active {
+    background-color: #0056b3;
+    color: white;
+}
+
+.sidebar .nav a.active:hover {
+    background-color: #0056b3;
+}
+
 .bottom-nav {
     border-top: 1px solid #ccc;
     padding-top: 10px;

@@ -18,29 +18,32 @@
             <i class="fas fa-bars menu-toggle"></i>
         </li>
         <li>
-            <a href="{{ url_for('main.home') }}">
+            <a href="{{ url_for('main.home') }}" class="{% if request.endpoint == 'main.home' %}active{% endif %}">
                 <i class="fas fa-home"></i> <span>Home</span>
             </a>
         </li>
         <li>
-            <a href="{{ url_for('main.calendar') }}">
+            <a href="{{ url_for('main.calendar') }}"
+               class="{% if request.endpoint == 'main.calendar' %}active{% endif %}">
                 <i class="fas fa-calendar"></i> <span>Calendar</span>
             </a>
         </li>
         <li>
-            <a href="{{ url_for('main.tasks') }}">
+            <a href="{{ url_for('main.tasks') }}" class="{% if request.endpoint == 'main.tasks' %}active{% endif %}">
                 <i class="fas fa-tasks"></i> <span>Tasks</span>
             </a>
         </li>
         <li>
-            <a href="{{ url_for('main.booking') }}">
+            <a href="{{ url_for('main.booking') }}"
+               class="{% if request.endpoint == 'main.booking' %}active{% endif %}">
                 <i class="fas fa-book"></i> <span>Booking</span>
             </a>
         </li>
 
         {% if session['user_role'] in ['technician', 'admin'] %}
             <li>
-                <a href="{{ url_for('main.inventory') }}">
+                <a href="{{ url_for('main.inventory') }}"
+                   class="{% if request.endpoint == 'main.inventory' %}active{% endif %}">
                     <i class="fas fa-boxes"></i> <span>Inventory</span>
                 </a>
             </li>
@@ -48,7 +51,8 @@
 
         {% if session['user_role'] in ['admin'] %}
             <li>
-                <a href="{{ url_for('main.verification') }}">
+                <a href="{{ url_for('main.verification') }}"
+                   class="{% if request.endpoint == 'main.verification' %}active{% endif %}">
                     <i class="fa-solid fa-person-circle-check"></i> <span>Verification</span>
                 </a>
             </li>
@@ -58,7 +62,8 @@
     <!-- Bottom Navigation -->
     <ul class="nav bottom-nav">
         <li>
-            <a href="{{ url_for('main.profile') }}">
+            <a href="{{ url_for('main.profile') }}"
+               class="{% if request.endpoint == 'main.profile' %}active{% endif %}">
                 <i class="fas fa-user"></i> <span>Profile</span>
             </a>
         </li>
