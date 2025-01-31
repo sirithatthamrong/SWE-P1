@@ -1,24 +1,16 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
 {% block content %}
     <div class="container mt-4">
-        <!-- Greeting Section -->
-        <h2 class="mb-4">
-            Welcome, {{ username }}!
-        </h2>
+        <h2 class="mb-4">Welcome, {{ username }}!</h2>
 
-        <div class="welcome-container">
-            <img
-                    src="{{ url_for('static', filename='images/piti.png') }}"
-                    alt="User"
-                    class="user-image"
-            >
-            <div class="thought-bubble">
-                <p>Let’s start working!</p>
-            </div>
-        </div>
-
-        <!-- Quick Links Section -->
         <p class="mt-4">Here’s a quick overview of what you can do today:</p>
 
         <div class="row mt-4">
@@ -52,5 +44,17 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Fixed Bottom-Right Section -->
+    <div class="welcome-container">
+        <div class="thought-bubble">
+            <p>Let’s start working!</p>
+        </div>
+        <img
+                src="{{ url_for('static', filename='images/img.png') }}"
+                alt="User"
+                class="user-image"
+        >
     </div>
 {% endblock %}

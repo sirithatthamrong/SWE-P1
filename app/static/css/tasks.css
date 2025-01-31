@@ -70,11 +70,37 @@ body {
     background-color: #218838;
 }
 
+.date-picker-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+}
+
+.date-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.date-wrapper input[type="date"] {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    padding: 5px 10px;
+    outline: none;
+    appearance: none;
+}
+
+
 /* Ensure the main container uses flexbox */
 .main-container {
     display: flex;
-    flex-direction: row;  /* Ensure horizontal layout */
-    gap: 20px;  /* Space between filters and tasks */
+    flex-direction: row;
+    gap: 20px;
     padding: 20px;
     background: #eef3f7;
     border-radius: 10px;
@@ -348,4 +374,34 @@ body {
 
 .modal-buttons .delete-btn:hover {
     background-color: #cc0000;
+}
+
+.filters {
+    font-size: 16px;
+}
+
+.filters label,
+.filters input,
+.filters select,
+.filters button {
+    font-size: 16px;
+}
+
+.filters input[type="date"] {
+    font-size: 16px;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.filters input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 5px;
+    vertical-align: middle;
+    margin-left: 15px;
+}
+
+.filters label {
+    vertical-align: middle;
 }
