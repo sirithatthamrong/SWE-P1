@@ -16,8 +16,6 @@ User**—has **tailored access to the system**, maintaining **security, accounta
 3. [Features](#features)
 4. [Project Structure](#project-structure)
 5. [Technology Stack](#technology-stack)
-6. [Deployment Guide](#deployment-guide)
-
 
 ## **Installation Guide**
 
