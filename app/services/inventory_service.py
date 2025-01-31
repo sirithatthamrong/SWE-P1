@@ -110,6 +110,7 @@ def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=N
         db.session.rollback()
         return {"error": str(e)}, 500
 
+
 def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_qty):
     technicians_sql = text("""
         SELECT user_id
@@ -151,6 +152,7 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
             "tid": new_task_id,
             "uid": row.user_id
         })
+
 
 def create_inventory_item(item_data):
     try:

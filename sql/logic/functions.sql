@@ -336,8 +336,8 @@ CREATE OR REPLACE FUNCTION create_inventory_item(
 ) RETURNS TEXT AS
 $$
 DECLARE
-    v_supplier_id INTEGER;
-    v_item_id INTEGER;
+    v_supplier_id     INTEGER;
+    v_item_id         INTEGER;
     v_expiration_date DATE;
 BEGIN
     -- Validate reorder_level
@@ -355,16 +355,15 @@ BEGIN
         INSERT INTO Suppliers (supplier_name, contact_info)
         VALUES (p_supplier_name, p_contact_info)
         ON CONFLICT (supplier_name) DO UPDATE
-        SET contact_info = EXCLUDED.contact_info
+            SET contact_info = EXCLUDED.contact_info
         RETURNING supplier_id INTO v_supplier_id;
     END IF;
 
-    -- Handle expiration date: Ensure it's never NULL
+    -- Handle expiration date
     IF p_no_expiry THEN
         v_expiration_date := '9999-12-31';
     ELSE
-        -- Use provided expiration date or default to '9999-12-31' if not provided
-        v_expiration_date := COALESCE(p_expiration_date, '9999-12-31');
+        v_expiration_date := p_expiration_date;
     END IF;
 
     -- Insert inventory item
@@ -372,7 +371,7 @@ BEGIN
     VALUES (p_category_id, p_item_name, p_reorder_level, v_supplier_id)
     RETURNING item_id INTO v_item_id;
 
-    -- Insert initial inventory batch with quantity 0
+    -- Insert inventory batch
     INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
     VALUES (v_item_id, 0, v_expiration_date);
 

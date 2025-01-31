@@ -213,14 +213,14 @@ CREATE TABLE TaskLogs
 
 CREATE TABLE InventoryBatches
 (
-    batch_id SERIAL PRIMARY KEY,
-    item_id  INTEGER NOT NULL REFERENCES InventoryItems(item_id),
+    batch_id        SERIAL PRIMARY KEY,
+    item_id         INTEGER NOT NULL REFERENCES InventoryItems (item_id),
 
-    quantity INTEGER NOT NULL CHECK (quantity >= 0),
+    quantity        INTEGER NOT NULL CHECK (quantity >= 0),
 
     -- For truly no-expiry items, store '9999-12-31'
-    expiration_date DATE NOT NULL DEFAULT '9999-12-31',
+    expiration_date DATE    NOT NULL DEFAULT '9999-12-31',
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
 
