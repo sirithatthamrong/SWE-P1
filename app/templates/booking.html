@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
+{% block title %}Booking{% endblock %}
 
 {% block content %}
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}LabSync{% endblock %}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
     </head>
 
@@ -41,7 +41,7 @@
 
                 <div class="form-group">
                     <label for="date">Date:</label>
-                    <input type="date" id="date" name="date" min="{{ today }}">
+                    <input type="date" id="date" name="date" min="{{ today }}" required>
                 </div>
 
                 <div class="form-group">
