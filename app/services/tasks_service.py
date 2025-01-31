@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from sqlalchemy import text
+
 from app import db
 
 
@@ -7,23 +9,27 @@ def get_tasks_for_user(user_id):
     query = text("SELECT * FROM get_tasks_for_user(:user_id)")
     result = db.session.execute(query, {"user_id": user_id}).fetchall()
 
-    return [{
-        "task_id": row.task_id,
-        "task_name": row.task_name,
-        "task_description": row.task_description,
-        "due_date": row.due_date.strftime("%Y-%m-%d"),
-        "priority": row.priority,
-        "status": row.status,
-        "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "created_by": row.created_by,
-        "creator_name": row.creator_name,
-        "task_type": row.task_type
-    } for row in result]
+    return [
+        {
+            "task_id": row.task_id,
+            "task_name": row.task_name,
+            "task_description": row.task_description,
+            "due_date": row.due_date.strftime("%Y-%m-%d"),
+            "priority": row.priority,
+            "status": row.status,
+            "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "created_by": row.created_by,
+            "creator_name": row.creator_name,
+            "task_type": row.task_type,
+        }
+        for row in result
+    ]
 
 
 def get_tasks_created_by_user(user_id):
-    query = text("""
+    query = text(
+        """
         SELECT
             t.task_id,
             t.task_name,
@@ -39,28 +45,37 @@ def get_tasks_created_by_user(user_id):
         JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
         WHERE t.created_by = :user_id
         ORDER BY t.created_at DESC
-    """)
+    """
+    )
     result = db.session.execute(query, {"user_id": user_id}).fetchall()
 
     tasks = []
     for row in result:
-        tasks.append({
-            "task_id": row.task_id,
-            "task_name": row.task_name,
-            "task_description": row.task_description,
-            "due_date": row.due_date.strftime("%Y-%m-%d"),
-            "priority": row.priority,
-            "status": row.status,
-            "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-            "created_by": row.created_by,
-            "task_type": row.task_type
-        })
+        tasks.append(
+            {
+                "task_id": row.task_id,
+                "task_name": row.task_name,
+                "task_description": row.task_description,
+                "due_date": row.due_date.strftime("%Y-%m-%d"),
+                "priority": row.priority,
+                "status": row.status,
+                "created_at": row.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "updated_at": row.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "created_by": row.created_by,
+                "task_type": row.task_type,
+            }
+        )
     return tasks
 
 
 def validate_task_data(data):
-    required_fields = ["task_name", "task_description", "due_date", "task_type_id", "assigned_to"]
+    required_fields = [
+        "task_name",
+        "task_description",
+        "due_date",
+        "task_type_id",
+        "assigned_to",
+    ]
 
     missing = [field for field in required_fields if not data.get(field)]
     if missing:
@@ -78,49 +93,58 @@ def validate_task_data(data):
 
 
 def insert_task(data, creator_id):
-    query = text("""
+    query = text(
+        """
         INSERT INTO Tasks (
             task_name, task_description, due_date, task_type_id, priority,
             created_by, created_at, updated_at
         )
         VALUES (
-            :task_name, :task_description, :due_date, :task_type_id, 
+            :task_name, :task_description, :due_date, :task_type_id,
             :priority, :creator_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING task_id
-    """)
+    """
+    )
 
-    result = db.session.execute(query, {
-        "task_name": data["task_name"],
-        "task_description": data["task_description"],
-        "due_date": data["due_date"],
-        "task_type_id": data["task_type_id"],
-        "priority": data.get("priority", "medium"),
-        "creator_id": creator_id
-    })
+    result = db.session.execute(
+        query,
+        {
+            "task_name": data["task_name"],
+            "task_description": data["task_description"],
+            "due_date": data["due_date"],
+            "task_type_id": data["task_type_id"],
+            "priority": data.get("priority", "medium"),
+            "creator_id": creator_id,
+        },
+    )
 
     return result.fetchone()[0]
 
 
 def assign_users_to_task(task_id, assigned_users):
     try:
-        user_ids = [uid.strip() for uid in assigned_users.split(';') if uid.strip()]
+        user_ids = [uid.strip() for uid in assigned_users.split(";") if uid.strip()]
 
         if not user_ids:
             return {"error": "At least one user must be assigned."}, 400
 
         # Validate that all user IDs exist in the database
         valid_users_query = text("SELECT user_id FROM Users WHERE user_id IN :user_ids")
-        valid_users = db.session.execute(valid_users_query, {"user_ids": tuple(user_ids)}).fetchall()
+        valid_users = db.session.execute(
+            valid_users_query, {"user_ids": tuple(user_ids)}
+        ).fetchall()
         valid_user_ids = {row.user_id for row in valid_users}
 
         for uid in user_ids:
             if int(uid) not in valid_user_ids:
                 return {"error": f"User ID {uid} does not exist."}, 400
 
-        insert_assignment = text("""
+        insert_assignment = text(
+            """
             INSERT INTO TaskAssignments (task_id, user_id) VALUES (:task_id, :user_id)
-        """)
+        """
+        )
 
         for uid in user_ids:
             db.session.execute(insert_assignment, {"task_id": task_id, "user_id": uid})
@@ -154,7 +178,9 @@ def create_task(data, creator_id):
 def accept_task(task_id, user_id):
     try:
         query = text("SELECT accept_task(:task_id, :user_id)")
-        result = db.session.execute(query, {"task_id": task_id, "user_id": user_id}).scalar()
+        result = db.session.execute(
+            query, {"task_id": task_id, "user_id": user_id}
+        ).scalar()
         db.session.commit()
 
         if result:
@@ -168,13 +194,15 @@ def accept_task(task_id, user_id):
 
 def complete_task(task_id):
     try:
-        query = text("""
+        query = text(
+            """
             UPDATE Tasks
             SET status = 'completed', completed_at = CURRENT_TIMESTAMP
             WHERE task_id = :task_id
               AND status IN ('overdue', 'in progress')
             RETURNING task_id
-        """)
+        """
+        )
         result = db.session.execute(query, {"task_id": task_id})
         db.session.commit()
 

@@ -7,7 +7,7 @@ Install required packages
 poetry install
 ```
 Run it.
-``` 
+```
 poetry run flask run --host=0.0.0.0 --port=10000
 ```
 
@@ -25,4 +25,4 @@ poetry run pytest
 ```
 
 ## Coding Convention
-PEP-8. 
+PEP-8.

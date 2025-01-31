@@ -44,4 +44,3 @@ networks:
 volumes:
     lab_db_data:
       driver: local
-
