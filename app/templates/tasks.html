@@ -51,9 +51,11 @@
                 <div><input type="checkbox" class="filter-priority" value="high"> High</div>
             </div>
 
-            <div class="filter-section">
-                <label>Due Date:</label>
-                <input type="date" id="filter-due-date">
+            <div class="form-group date-picker-container">
+                <label for="due_date">Due Date:</label>
+                <div class="date-wrapper">
+                    <input type="date" name="due_date" id="due_date" required>
+                </div>
             </div>
             <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
         </div>
