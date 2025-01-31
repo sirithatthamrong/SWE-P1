@@ -1,5 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[id^="no_expiry_"]').forEach(checkbox => {
+   document.querySelectorAll('[id^="no_expiry_"]').forEach(checkbox => {
         checkbox.addEventListener("change", function () {
             let itemId = this.id.replace("no_expiry_", "");
             let expiryInput = document.getElementById("exp_date_" + itemId);
@@ -12,8 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
-});
-
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('[name="new_quantity"]').forEach(input => {
@@ -31,4 +28,20 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const noExpiryCheckbox = document.getElementById("no_expiry");
+    const expirationDateInput = document.getElementById("expiration_date");
+
+    if (noExpiryCheckbox && expirationDateInput) {
+        noExpiryCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                expirationDateInput.disabled = true;
+                expirationDateInput.value = ""; // Clear the date
+            } else {
+                expirationDateInput.disabled = false;
+            }
+        });
+    }
 });

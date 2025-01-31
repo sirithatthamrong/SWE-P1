@@ -6,97 +6,152 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Inventory</title>
-
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}">
     </head>
 
     <div class="container-fluid mt-4">
-        <h2 class="mb-4 inventory-header">Inventory Items</h2> <!-- Left-aligned header -->
+        <h2 class="mb-4 inventory-header">Inventory Management</h2>
 
-        <table class="table table-striped table-bordered">
-            <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>Category</th>
-                <th>Total Qty</th>
-                <th>Reorder Level</th>
-                <th>Expiry Status</th>
-                <th>Enter Qty</th>
-                <th>Expiry Date</th>
-                <th>Update</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for data in items %}
-                {% set computed_qty = data.total_qty %}
-                {% set reorder_level = data["item"]["reorder_level"] %}
-              
-                <tr class="{% if computed_qty <= reorder_level %}table-danger{% endif %}">
-                    <td class="{% if computed_qty <= reorder_level %}text-danger fw-bold{% endif %}">
-                        {{ data["item"]["name"] }}
-                    </td>
-                    <td>{{ data["item"]["category_name"] }}</td>
-                    <td>{{ computed_qty }}</td>
-                    <td>{{ reorder_level }}</td>
-                    <td>
-                        {% if data.has_real_expiry %}
-                            <span class="badge bg-success">Has Expiry</span>
-                        {% else %}
-                            <span class="badge bg-secondary">No Expiry</span>
-                        {% endif %}
-                    </td>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="inventoryTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#view-tab">View Inventory</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#add-tab">Add New Item</button>
+            </li>
+        </ul>
 
-                    <form action="{{ url_for('main.inventory') }}" method="POST" class="d-flex align-items-center">
-                        <td>
-                            <input type="number"
-                                   name="new_quantity"
-                                   min="0"
-                                   class="form-control"
-                                   placeholder="Qty"
-                                   required>
-                            <input type="hidden"
-                                   name="item_id"
-                                   value="{{ data['item']['item_id'] }}">
-                        </td>
-                        <td>
-                            {% if data.has_real_expiry %}
-                                <input type="date" name="expiration_date" class="form-control">
-                            {% else %}
-                                <input type="date" name="expiration_date" class="form-control d-none" disabled>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button type="submit" class="btn btn-custom">
-                                <i class="fas fa-save"></i> Save
-                            </button> <!-- Uses external CSS -->
-                        </td>
-                    </form>
-                </tr>
-
-                {% if data["batches"] %}
-                    <tr class="bg-light">
-                        <td colspan="8" class="small">
-                            <strong>Batches:</strong>
-                            <ul class="mb-0 ps-3">
-                                {% for batch in data["batches"] %}
-                                    {% set b_str = (batch["expiration_date"]|string)[:10] %}
-                                    <li>
-                                        {% if b_str == "9999-12-31" %}
-                                            Expires <strong>No Expiry</strong>,
-                                        {% else %}
-                                            Expires <strong>{{ b_str }}</strong>,
-                                        {% endif %}
-                                        Qty <strong>{{ batch["quantity"] }}</strong>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </td>
+        <div class="tab-content">
+            <!-- View Inventory Tab -->
+            <div class="tab-pane fade show active" id="view-tab">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>Total Qty</th>
+                        <th>Reorder Level</th>
+                        <th>Expiry Status</th>
+                        <th>Enter Qty</th>
+                        <th>Expiry Date</th>
+                        <th>Update</th>
                     </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                    {% for item_data in items %}
+                        <tr class="{% if item_data.total_qty <= item_data.item.reorder_level %}table-danger{% endif %}">
+                            <td>{{ item_data.item.name }}</td>
+                            <td>{{ item_data.item.category_name }}</td>
+                            <td class="text-center">{{ item_data.total_qty }}</td>
+                            <td class="text-center">{{ item_data.item.reorder_level }}</td>
+                            <td class="text-center">
+                                    <span class="badge bg-{% if item_data.has_real_expiry %}success{% else %}secondary{% endif %}">
+                                        {{ "Has Expiry" if item_data.has_real_expiry else "No Expiry" }}
+                                    </span>
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('main.inventory') }}">
+                                    <input type="hidden" name="item_id" value="{{ item_data.item.item_id }}">
+                                    <input type="number" name="new_quantity" class="form-control" min="0" required>
+                            </td>
+                            <td>
+                                <input type="date" name="expiration_date" class="form-control"
+                                       {% if not item_data.has_real_expiry %}disabled{% endif %}>
+                            </td>
+                            <td>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        {% if item_data.batches %}
+                            <tr>
+                                <td colspan="8">
+                                    <strong>Batches:</strong>
+                                    <ul>
+                                        {% for batch in item_data.batches %}
+                                            <li>
+                                                {% if batch.expiration_date.strftime('%Y-%m-%d') == '9999-12-31' %}
+                                                    <em>No Expiry</em>, Qty {{ batch.quantity }}
+                                                {% else %}
+                                                    Expires {{ batch.expiration_date.strftime('%Y-%m-%d') }}, Qty
+                                                    {{ batch.quantity }}
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="add-tab">
+                <form method="POST" action="{{ url_for('main.add_inventory_item') }}" class="card p-4">
+                    <div class="row g-3">
+                        <!-- Item Name -->
+                        <div class="col-md-6">
+                            <label for="item_name" class="form-label">Item Name</label>
+                            <input type="text" class="form-control" id="item_name" name="item_name" required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-6">
+                            <label for="category_id" class="form-label">Category</label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                {% for category in categories %}
+                                    <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Reorder Level -->
+                        <div class="col-md-6">
+                            <label for="reorder_level" class="form-label">Reorder Level</label>
+                            <input type="number" class="form-control" id="reorder_level" name="reorder_level" min="0"
+                                   required>
+                        </div>
+
+                        <!-- Supplier Name -->
+                        <div class="col-md-6">
+                            <label for="supplier_name" class="form-label">Supplier Name</label>
+                            <input type="text" class="form-control" id="supplier_name" name="supplier_name">
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="col-md-6">
+                            <label for="contact_info" class="form-label">Contact Info</label>
+                            <input type="text" class="form-control" id="contact_info" name="contact_info">
+                        </div>
+
+                        <!-- No Expiry Checkbox -->
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="no_expiry" name="no_expiry">
+                                <label class="form-check-label" for="no_expiry">No Expiry</label>
+                            </div>
+                        </div>
+
+                        <!-- Expiration Date -->
+                        <div class="col-md-6">
+                            <label for="expiration_date" class="form-label">Expiration Date</label>
+                            <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Add Item to Inventory</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/inventory.js') }}"></script>
 {% endblock %}

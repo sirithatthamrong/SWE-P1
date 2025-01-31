@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION prevent_double_booking()
     RETURNS TRIGGER AS
 $$
@@ -321,5 +322,60 @@ BEGIN
     UPDATE Users
     SET requested_role = p_requested_role
     WHERE user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION create_inventory_item(
+    p_item_name VARCHAR,
+    p_category_id INTEGER,
+    p_reorder_level INTEGER,
+    p_supplier_name VARCHAR DEFAULT NULL,
+    p_contact_info TEXT DEFAULT NULL,
+    p_no_expiry BOOLEAN DEFAULT FALSE,
+    p_expiration_date DATE DEFAULT NULL
+) RETURNS TEXT AS
+$$
+DECLARE
+    v_supplier_id INTEGER;
+    v_item_id INTEGER;
+    v_expiration_date DATE;
+BEGIN
+    -- Validate reorder_level
+    IF p_reorder_level < 0 THEN
+        RAISE EXCEPTION 'Reorder Level must be a non-negative integer';
+    END IF;
+
+    -- Check if category exists
+    IF NOT EXISTS (SELECT 1 FROM InventoryCategories WHERE category_id = p_category_id) THEN
+        RAISE EXCEPTION 'Invalid category selected';
+    END IF;
+
+    -- Handle supplier
+    IF p_supplier_name IS NOT NULL THEN
+        INSERT INTO Suppliers (supplier_name, contact_info)
+        VALUES (p_supplier_name, p_contact_info)
+        ON CONFLICT (supplier_name) DO UPDATE
+        SET contact_info = EXCLUDED.contact_info
+        RETURNING supplier_id INTO v_supplier_id;
+    END IF;
+
+    -- Handle expiration date: Ensure it's never NULL
+    IF p_no_expiry THEN
+        v_expiration_date := '9999-12-31';
+    ELSE
+        -- Use provided expiration date or default to '9999-12-31' if not provided
+        v_expiration_date := COALESCE(p_expiration_date, '9999-12-31');
+    END IF;
+
+    -- Insert inventory item
+    INSERT INTO InventoryItems (category_id, name, reorder_level, supplier_id)
+    VALUES (p_category_id, p_item_name, p_reorder_level, v_supplier_id)
+    RETURNING item_id INTO v_item_id;
+
+    -- Insert initial inventory batch with quantity 0
+    INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
+    VALUES (v_item_id, 0, v_expiration_date);
+
+    RETURN 'Item added successfully';
 END;
 $$ LANGUAGE plpgsql;
