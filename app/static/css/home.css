@@ -1,6 +1,5 @@
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f4f7fc;
     margin: 0;
     padding: 0;
 }
@@ -39,6 +38,7 @@ body {
 }
 
 .sidebar .nav a {
+    font-family: 'Poppins', sans-serif;
     text-decoration: none;
     color: #2c3e50;
     font-size: 16px;
@@ -98,48 +98,55 @@ body {
 
 /* Welcome Section */
 .welcome-container {
+    position: fixed;
+    bottom: 1px;
+    right: 20px;
     display: flex;
     align-items: center;
-    margin-top: 40px;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    gap: 15px;
 }
 
 .user-image {
-    width: 150px;
-    height: auto;
-    border-radius: 50%;
+    width: 400px;
+    height: 500px;
+    border-radius: 0;
+    object-fit: cover;
+    border: 0;
 }
 
+/* Thought Bubble */
 .thought-bubble {
     background: #eef3f7;
-    padding: 20px;
+    padding: 15px 15px 2px 15px;
+    font-size: 24px;
     border-radius: 20px;
-    margin-left: 20px;
     position: relative;
     color: #2c3e50;
+    text-align: center;
+    margin-right: -30px;
+    margin-bottom: 200px;
 }
 
+/* Thought Bubble Tail */
 .thought-bubble::before {
     content: "";
     width: 20px;
     height: 20px;
     background: #eef3f7;
     position: absolute;
-    left: -10px;
+    right: -10px;
     top: 50%;
     border-radius: 50%;
+    transform: translateY(-50%);
 }
 
 .thought-bubble::after {
     content: "";
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: #eef3f7;
     position: absolute;
-    left: -20px;
+    right: -22px;
     top: 60%;
     border-radius: 50%;
 }
