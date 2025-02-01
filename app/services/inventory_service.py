@@ -156,31 +156,52 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
 
 def create_inventory_item(item_data):
     try:
-        # Call the PostgreSQL function
+        # Ensure initial quantity is provided and is an integer.
+        initial_quantity = int(item_data.get('initial_quantity', 0))
+        if initial_quantity < 0:
+            return {"error": "Initial quantity cannot be negative"}, 400
+
+        # Ensure supplier name is provided.
+        if not item_data.get('supplier_name'):
+            return {"error": "Supplier name is required."}, 400
+
+        # Process the expiration date:
+        # Many HTML date inputs return an empty string if nothing is selected.
+        expiration_date = item_data.get('expiration_date')
+        if expiration_date is not None and expiration_date.strip() == "":
+            expiration_date = None
+
+        # Build the query.
+        # Note that the placeholders match exactly the parameter names in the SQL function.
         query = text("""
             SELECT create_inventory_item(
-                :item_name,
-                :category_id,
-                :reorder_level,
-                :supplier_name,
-                :contact_info,
-                :no_expiry,
-                :expiration_date
+                :p_item_name,
+                :p_category_id,
+                :p_reorder_level,
+                :p_supplier_name,
+                :p_contact_info,
+                :p_no_expiry,
+                :p_expiration_date,
+                :p_initial_quantity
             ) AS result;
         """)
 
+        # Execute the query using the matching parameter names.
         result = db.session.execute(query, {
-            "item_name": item_data['item_name'],
-            "category_id": item_data['category_id'],
-            "reorder_level": item_data['reorder_level'],
-            "supplier_name": item_data.get('supplier_name'),
-            "contact_info": item_data.get('contact_info'),
-            "no_expiry": item_data.get('no_expiry') == 'on',  # Convert checkbox value to boolean
-            "expiration_date": item_data.get('expiration_date')
+            "p_item_name": item_data['item_name'],
+            "p_category_id": item_data['category_id'],
+            "p_reorder_level": item_data['reorder_level'],
+            "p_supplier_name": item_data.get('supplier_name'),
+            "p_contact_info": item_data.get('contact_info'),
+            # Expecting the checkbox to provide "on" when checked.
+            "p_no_expiry": item_data.get('no_expiry') == 'on',
+            "p_expiration_date": expiration_date,
+            "p_initial_quantity": initial_quantity
         }).fetchone()
 
         db.session.commit()
 
+        # Check the result returned by the SQL function.
         if result and result.result == 'Item added successfully':
             return {"message": result.result}, 200
         else:

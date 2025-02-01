@@ -223,4 +223,3 @@ CREATE TABLE InventoryBatches
 
     created_at      TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
-

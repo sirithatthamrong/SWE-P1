@@ -327,59 +327,48 @@ CREATE OR REPLACE FUNCTION create_inventory_item(
     p_item_name VARCHAR,
     p_category_id INTEGER,
     p_reorder_level INTEGER,
-    p_initial_quantity INTEGER DEFAULT 0, -- New parameter for initial quantity
-    p_supplier_name VARCHAR DEFAULT NULL,
-    p_contact_info TEXT DEFAULT NULL,
-    p_no_expiry BOOLEAN DEFAULT FALSE,
-    p_expiration_date DATE DEFAULT NULL
+    p_supplier_name VARCHAR,
+    p_contact_info TEXT,
+    p_no_expiry BOOLEAN,
+    p_expiration_date DATE DEFAULT NULL,
+    p_initial_quantity INTEGER DEFAULT 0
 ) RETURNS TEXT AS
 $$
 DECLARE
-    v_supplier_id     INTEGER;
-    v_item_id         INTEGER;
-    v_expiration_date DATE;
+    new_item_id   INTEGER;
+    v_supplier_id INTEGER;
 BEGIN
-    -- Validate reorder_level
-    IF p_reorder_level < 0 THEN
-        RAISE EXCEPTION 'Reorder Level must be a non-negative integer';
-    END IF;
+    -- 1. Check if supplier exists; if not, insert it.
+    SELECT supplier_id
+    INTO v_supplier_id
+    FROM Suppliers
+    WHERE supplier_name = p_supplier_name
+    LIMIT 1;
 
-    -- Validate initial quantity
-    IF p_initial_quantity < 0 THEN
-        RAISE EXCEPTION 'Initial quantity must be a non-negative integer';
-    END IF;
-
-    -- Check if category exists
-    IF NOT EXISTS (SELECT 1 FROM InventoryCategories WHERE category_id = p_category_id) THEN
-        RAISE EXCEPTION 'Invalid category selected';
-    END IF;
-
-    -- Handle supplier
-    IF p_supplier_name IS NOT NULL THEN
+    IF v_supplier_id IS NULL THEN
         INSERT INTO Suppliers (supplier_name, contact_info)
         VALUES (p_supplier_name, p_contact_info)
-        ON CONFLICT (supplier_name) DO UPDATE
-            SET contact_info = EXCLUDED.contact_info
         RETURNING supplier_id INTO v_supplier_id;
     END IF;
 
-    -- Handle expiration date: Ensure it's never NULL
-    IF p_no_expiry THEN
-        v_expiration_date := '9999-12-31';
-    ELSE
-        -- Use provided expiration date or default to '9999-12-31' if not provided
-        v_expiration_date := COALESCE(p_expiration_date, '9999-12-31');
+    -- 2. Insert the new inventory item using the correct supplier_id.
+    INSERT INTO InventoryItems (name, category_id, reorder_level, supplier_id)
+    VALUES (p_item_name,
+            p_category_id,
+            p_reorder_level,
+            v_supplier_id)
+    RETURNING item_id INTO new_item_id;
+
+    -- 3. Handle expiration date.
+    IF p_no_expiry OR p_expiration_date IS NULL THEN
+        p_expiration_date := '9999-12-31';
     END IF;
 
-    -- Insert inventory item
-    INSERT INTO InventoryItems (category_id, name, reorder_level, supplier_id)
-    VALUES (p_category_id, p_item_name, p_reorder_level, v_supplier_id)
-    RETURNING item_id INTO v_item_id;
-
-    -- Insert initial inventory batch with the specified quantity
+    -- 4. Insert the initial batch.
     INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
-    VALUES (v_item_id, p_initial_quantity, v_expiration_date);
+    VALUES (new_item_id, p_initial_quantity, p_expiration_date);
 
     RETURN 'Item added successfully';
 END;
 $$ LANGUAGE plpgsql;
+

@@ -35,3 +35,23 @@ document.addEventListener("DOMContentLoaded", function () {
     applyFiltersButton.addEventListener("click", filterItems);
     searchBar.addEventListener("input", filterItems);
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const noExpiryCheckbox = document.getElementById("no_expiry");
+    const expirationDateInput = document.getElementById("expiration_date");
+
+    // Function to toggle expiry date input
+    function toggleExpiryDate() {
+        if (noExpiryCheckbox.checked) {
+            expirationDateInput.value = "";  // Clear date
+            expirationDateInput.disabled = true;
+        } else {
+            expirationDateInput.disabled = false;
+        }
+    }
+
+    // Run once when the page loads
+    toggleExpiryDate();
+
+    // Attach event listener to checkbox
+    noExpiryCheckbox.addEventListener("change", toggleExpiryDate);
+});
