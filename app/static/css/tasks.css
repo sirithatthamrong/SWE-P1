@@ -169,6 +169,7 @@ body {
     margin-bottom: 10px;
 }
 
+/* Add hover effect for tabs */
 .tab-button {
     flex: 1;
     padding: 10px;
@@ -177,11 +178,20 @@ body {
     border: none;
     outline: none;
     text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
+.tab-button:hover {
+    background-color: #e1e0e0; /* Light gray background on hover */
+    color: #0056b3; /* Change text color to blue */
+}
+
+/* Ensure the active tab remains distinguishable */
 .tab-button.active {
-    border-bottom: 2px solid #007bff;
+    border-bottom: 3px solid #0056b3;
     font-weight: bold;
+    color: #0056b3
 }
 
 .tab-content {
@@ -263,16 +273,17 @@ body {
     width: 300px;
 }
 
+
 /* Improve spacing and alignment for checkboxes */
 .filter-section label{
     font-size: 16px;
-    /*font-weight: bold;*/
     color: #333;
     cursor: pointer;
 }
 
 .filter-section input[type="checkbox"] {
-    margin-right: 8px;
+    margin-left: 10px;
+    margin-right: 5px;
     transform: scale(1.2); /* Slightly enlarge checkboxes */
 }
 
@@ -283,7 +294,7 @@ body {
     color: white;
     border: none;
     cursor: pointer;
-    width: 100%;
+    width: 96%;
     border-radius: 5px;
     font-weight: bold;
     font-size: 16px;
