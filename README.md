@@ -83,7 +83,7 @@ credentials:
 
 - **View Personal & Other User Details**: Users can view their own and others' profiles.
 
-### **5️⃣ Inventory Management (Technician Only)**
+### **5️⃣ Inventory Management (Technician and Admin Only)**
 
 - **Update Stock Levels**: Add, remove, or update stock levels for equipment, chemicals, and consumables.
 - **Automated Restocking Alerts** when stock falls below reorder levels.
