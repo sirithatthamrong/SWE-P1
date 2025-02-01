@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("date").setAttribute("min", today);
 });
 
-let roomsPerPage = 16;
+let roomsPerPage = 15;
 let currentPage = 1;
 let totalRooms = [];
 let totalPages = 1;
