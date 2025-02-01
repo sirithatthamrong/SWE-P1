@@ -39,23 +39,18 @@
                                 <div class="form-group">
                                     <label>Categories</label>
                                     <div class="checkbox-group">
-                                        <div class="filter-option">
-                                            <input class="filter-role" type="checkbox" id="filter-all" checked>
-                                            <label for="filter-all">All Categories</label>
-                                        </div>
                                         {% for category in categories %}
                                             <div class="filter-option">
                                                 <input class="filter-role category-filter" type="checkbox"
                                                        id="filter-{{ category.category_id }}"
-                                                       value="{{ category.category_id }}"
-                                                       checked>
+                                                       value="{{ category.category_id }}">
                                                 <label for="filter-{{ category.category_id }}">{{ category.category_name }}</label>
                                             </div>
                                         {% endfor %}
                                     </div>
                                 </div>
                             </div>
-                            <button id="apply-filters" class="btn btn-primary mt-3">Apply Filters</button>
+                            <button id="apply-filters" class="btn btn-primary mt-3">Apply</button>
 
                         </div>
                     </div>
