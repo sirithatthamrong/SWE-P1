@@ -1,4 +1,3 @@
-
 CREATE OR REPLACE FUNCTION prevent_double_booking()
     RETURNS TRIGGER AS
 $$
@@ -266,43 +265,42 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_tasks_for_user(p_user_id INT)
-RETURNS TABLE
-        (
-            task_id          INT,
-            task_name        TEXT,
-            task_description TEXT,
-            due_date         DATE,
-            priority         TEXT,
-            status           TEXT,
-            created_at       TIMESTAMP,
-            updated_at       TIMESTAMP,
-            created_by       INT,
-            creator_name     TEXT,
-            task_type        TEXT
-        )
+    RETURNS TABLE
+            (
+                task_id          INT,
+                task_name        TEXT,
+                task_description TEXT,
+                due_date         DATE,
+                priority         TEXT,
+                status           TEXT,
+                created_at       TIMESTAMP,
+                updated_at       TIMESTAMP,
+                created_by       INT,
+                creator_name     TEXT,
+                task_type        TEXT
+            )
 AS
 $$
 BEGIN
     RETURN QUERY
-    SELECT t.task_id,
-           t.task_name::TEXT,
-           t.task_description,
-           t.due_date,
-           t.priority::TEXT,
-           t.status::TEXT,
-           t.created_at,
-           t.updated_at,
-           t.created_by,
-           u.username::TEXT AS creator_name,
-           tt.task_name::TEXT AS task_type
-    FROM Tasks t
-    JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
-    JOIN TaskAssignments ta ON ta.task_id = t.task_id
-    JOIN Users u ON t.created_by = u.user_id
-    WHERE ta.user_id = p_user_id
-    ORDER BY
-        CASE WHEN t.status = 'overdue' THEN 1 ELSE 2 END,
-        t.due_date ASC;
+        SELECT t.task_id,
+               t.task_name::TEXT,
+               t.task_description,
+               t.due_date,
+               t.priority::TEXT,
+               t.status::TEXT,
+               t.created_at,
+               t.updated_at,
+               t.created_by,
+               u.username::TEXT   AS creator_name,
+               tt.task_name::TEXT AS task_type
+        FROM Tasks t
+                 JOIN TaskTypes tt ON t.task_type_id = tt.task_type_id
+                 JOIN TaskAssignments ta ON ta.task_id = t.task_id
+                 JOIN Users u ON t.created_by = u.user_id
+        WHERE ta.user_id = p_user_id
+        ORDER BY CASE WHEN t.status = 'overdue' THEN 1 ELSE 2 END,
+                 t.due_date ASC;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -329,6 +327,7 @@ CREATE OR REPLACE FUNCTION create_inventory_item(
     p_item_name VARCHAR,
     p_category_id INTEGER,
     p_reorder_level INTEGER,
+    p_initial_quantity INTEGER DEFAULT 0, -- New parameter for initial quantity
     p_supplier_name VARCHAR DEFAULT NULL,
     p_contact_info TEXT DEFAULT NULL,
     p_no_expiry BOOLEAN DEFAULT FALSE,
@@ -345,6 +344,11 @@ BEGIN
         RAISE EXCEPTION 'Reorder Level must be a non-negative integer';
     END IF;
 
+    -- Validate initial quantity
+    IF p_initial_quantity < 0 THEN
+        RAISE EXCEPTION 'Initial quantity must be a non-negative integer';
+    END IF;
+
     -- Check if category exists
     IF NOT EXISTS (SELECT 1 FROM InventoryCategories WHERE category_id = p_category_id) THEN
         RAISE EXCEPTION 'Invalid category selected';
@@ -359,11 +363,12 @@ BEGIN
         RETURNING supplier_id INTO v_supplier_id;
     END IF;
 
-    -- Handle expiration date
+    -- Handle expiration date: Ensure it's never NULL
     IF p_no_expiry THEN
         v_expiration_date := '9999-12-31';
     ELSE
-        v_expiration_date := p_expiration_date;
+        -- Use provided expiration date or default to '9999-12-31' if not provided
+        v_expiration_date := COALESCE(p_expiration_date, '9999-12-31');
     END IF;
 
     -- Insert inventory item
@@ -371,9 +376,9 @@ BEGIN
     VALUES (p_category_id, p_item_name, p_reorder_level, v_supplier_id)
     RETURNING item_id INTO v_item_id;
 
-    -- Insert inventory batch
+    -- Insert initial inventory batch with the specified quantity
     INSERT INTO InventoryBatches (item_id, quantity, expiration_date)
-    VALUES (v_item_id, 0, v_expiration_date);
+    VALUES (v_item_id, p_initial_quantity, v_expiration_date);
 
     RETURN 'Item added successfully';
 END;

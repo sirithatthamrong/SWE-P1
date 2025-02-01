@@ -1,47 +1,82 @@
-document.querySelectorAll('[id^="no_expiry_"]').forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
-        let itemId = this.id.replace("no_expiry_", "");
-        let expiryInput = document.getElementById("exp_date_" + itemId);
-
-        if (this.checked) {
-            expiryInput.value = ""; // Clear input
-            expiryInput.disabled = true; // Disable field
-        } else {
-            expiryInput.disabled = false; // Enable field
-        }
-    });
-});
-
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[name="new_quantity"]').forEach(input => {
-        input.addEventListener("input", function () {
-            let row = this.closest("tr");
-            let expiryInput = row.querySelector('[name="expiration_date"]');
-            let hasExpiry = row.querySelector("td span").textContent.trim() === "Has Expiry";
+    const searchBar = document.getElementById("search-bar");
+    const applyFiltersButton = document.getElementById("apply-filters");
+    const categoryFilters = document.querySelectorAll(".category-filter");
+    const filterAll = document.getElementById("filter-all");
+    const inventoryTable = document.getElementById("inventory-table");
+    const tbody = inventoryTable.querySelector("tbody");
+    const mainRows = tbody.querySelectorAll("tr[data-name]"); // Only main item rows
 
-            if (hasExpiry) {
-                expiryInput.style.display = "inline-block";
-                expiryInput.disabled = false;
-            } else {
-                expiryInput.style.display = "none";
-                expiryInput.disabled = true;
-            }
-        });
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const noExpiryCheckbox = document.getElementById("no_expiry");
-    const expirationDateInput = document.getElementById("expiration_date");
-
-    if (noExpiryCheckbox && expirationDateInput) {
-        noExpiryCheckbox.addEventListener("change", function () {
-            if (this.checked) {
-                expirationDateInput.disabled = true;
-                expirationDateInput.value = ""; // Clear the date
-            } else {
-                expirationDateInput.disabled = false;
+    /**
+     * Resets the visibility of all rows when the page loads
+     */
+    function resetVisibility() {
+        mainRows.forEach(row => {
+            row.style.display = ""; // Show all main rows
+            let batchRow = row.nextElementSibling;
+            if (batchRow && !batchRow.hasAttribute("data-name")) {
+                batchRow.style.display = "";
             }
         });
     }
+
+    /**
+     * Filters inventory items based on search term and selected categories
+     */
+    function filterItems() {
+        const searchTerm = searchBar.value.toLowerCase().trim();
+        const selectedCategories = Array.from(categoryFilters)
+            .filter(filter => filter.checked)
+            .map(filter => filter.value);
+
+        mainRows.forEach(row => {
+            const itemName = row.getAttribute("data-name").toLowerCase();
+            const categoryId = row.getAttribute("data-category");
+
+            // Match conditions
+            const matchesSearch = searchTerm === "" || itemName.includes(searchTerm);
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(categoryId);
+
+            // Show/Hide row based on conditions
+            const shouldShow = matchesSearch && matchesCategory;
+            row.style.display = shouldShow ? "" : "none";
+
+            // Hide/show batch rows accordingly
+            let batchRow = row.nextElementSibling;
+            if (batchRow && !batchRow.hasAttribute("data-name")) {
+                batchRow.style.display = shouldShow ? "" : "none";
+            }
+        });
+    }
+
+    /**
+     * Ensure category selection is correctly handled
+     */
+    categoryFilters.forEach(filter => {
+        filter.addEventListener("change", function () {
+            if (!this.checked) {
+                filterAll.checked = false;
+            }
+            filterItems();
+        });
+    });
+
+    /**
+     * Handle "All Categories" checkbox behavior
+     */
+    filterAll.addEventListener("change", function () {
+        categoryFilters.forEach(filter => {
+            filter.checked = this.checked;
+        });
+        filterItems();
+    });
+
+    /**
+     * Event Listeners
+     */
+    applyFiltersButton.addEventListener("click", filterItems);
+    searchBar.addEventListener("input", filterItems);
+
+    // Ensure page starts with full visibility
+    resetVisibility();
 });
