@@ -111,49 +111,6 @@ def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=N
         return {"error": str(e)}, 500
 
 
-def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_qty):
-    technicians_sql = text("""
-        SELECT user_id
-        FROM Users
-        WHERE role = 'technician'
-    """)
-    tech_rows = db.session.execute(technicians_sql).fetchall()
-    if not tech_rows:
-        return  # no technicians to assign the task
-
-    task_sql = text("""
-        INSERT INTO Tasks (
-            task_name, task_description, due_date,
-            task_type_id, priority, created_by
-        )
-        VALUES (
-            :t_name, :t_desc, :due_date,
-            1,  -- or some 'task_type_id' for "Low Stock"
-            'high',
-            0   -- created_by = 0 => system?
-        )
-        RETURNING task_id
-    """)
-    description_text = (f"Item '{item_name}' is below reorder level! "
-                        f"Current qty: {current_qty}, reorder level: {reorder_level}.")
-    res = db.session.execute(task_sql, {
-        "t_name": f"LOW STOCK - {item_name}",
-        "t_desc": description_text,
-        "due_date": datetime.now().strftime('%Y-%m-%d')
-    })
-    new_task_id = res.fetchone()[0]
-
-    assign_sql = text("""
-        INSERT INTO TaskAssignments (task_id, user_id)
-        VALUES (:tid, :uid)
-    """)
-    for row in tech_rows:
-        db.session.execute(assign_sql, {
-            "tid": new_task_id,
-            "uid": row.user_id
-        })
-
-
 def create_inventory_item(item_data):
     try:
         # Ensure initial quantity is provided and is an integer.
