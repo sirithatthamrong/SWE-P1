@@ -70,42 +70,23 @@ body {
     background-color: #218838;
 }
 
-.date-picker-container {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-}
-
-.date-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.date-wrapper input[type="date"] {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-    padding: 5px 10px;
-    outline: none;
-    appearance: none;
-}
-
-
 /* Ensure the main container uses flexbox */
 .main-container {
     display: flex;
-    flex-direction: row;
-    gap: 20px;
+    flex-direction: row;  /* Ensure horizontal layout */
+    gap: 20px;  /* Space between filters and tasks */
     padding: 20px;
     background: #eef3f7;
     border-radius: 10px;
     margin: 20px auto;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filters h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 15px;
 }
 
 .task-columns {
@@ -188,33 +169,19 @@ body {
     margin-bottom: 10px;
 }
 
-/* Tab Buttons */
 .tab-button {
     flex: 1;
-    padding: 12px;
+    padding: 10px;
     cursor: pointer;
     background-color: #ffffff;
     border: none;
     outline: none;
     text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .tab-button.active {
-    border-bottom: 4px solid #0056b3;
-    color: #0056b3;
-}
-
-.tab-button:hover {
-    background-color: #f0f0f0;
-    color: #0056b3;
-}
-
-.tab-button:active {
-    background-color: #e0e0e0;
-    transform: scale(0.98);
+    border-bottom: 2px solid #007bff;
+    font-weight: bold;
 }
 
 .tab-content {
@@ -279,6 +246,61 @@ body {
 .danger {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+/* Filters should be positioned on the left */
+.filters {
+    width: 320px;
+    padding: 20px;
+    border-radius: 10px;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.filter-section {
+    margin-bottom: 15px;
+    width: 300px;
+}
+
+/* Improve spacing and alignment for checkboxes */
+.filter-section label{
+    font-size: 16px;
+    /*font-weight: bold;*/
+    color: #333;
+    cursor: pointer;
+}
+
+.filter-section input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2); /* Slightly enlarge checkboxes */
+}
+
+.filter-btn {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #74a9e3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+}
+
+.filter-section input[type="date"] {
+    width: 90%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #0056b3;
 }
 
 .create-task-form {
@@ -388,34 +410,4 @@ body {
 
 .modal-buttons .delete-btn:hover {
     background-color: #cc0000;
-}
-
-.filters {
-    font-size: 16px;
-}
-
-.filters label,
-.filters input,
-.filters select,
-.filters button {
-    font-size: 16px;
-}
-
-.filters input[type="date"] {
-    font-size: 16px;
-    padding: 10px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-.filters input[type="checkbox"] {
-    transform: scale(1.2);
-    margin-right: 5px;
-    vertical-align: middle;
-    margin-left: 15px;
-}
-
-.filters label {
-    vertical-align: middle;
 }

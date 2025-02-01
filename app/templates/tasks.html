@@ -6,6 +6,7 @@
     <!-- store the active_tab on the body or a wrapper container -->
     <body data-active-tab="{{ active_tab|default('my-tasks') }}">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
     <script defer src="{{ url_for('static', filename='js/tasks.js') }}"></script>
 
     <div class="overdue-tasks-section">
@@ -51,11 +52,9 @@
                 <div><input type="checkbox" class="filter-priority" value="high"> High</div>
             </div>
 
-            <div class="form-group date-picker-container">
-                <label for="due_date">Due Date:</label>
-                <div class="date-wrapper">
-                    <input type="date" name="due_date" id="due_date" required>
-                </div>
+            <div class="filter-section">
+                <label>Due Date:</label>
+                <input type="date" id="filter-due-date">
             </div>
             <button class="filter-btn" onclick="applyFilters()">Apply Filters</button>
         </div>
@@ -252,9 +251,12 @@
         </div>
     </body>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let today = new Date().toISOString().split("T")[0];
+            document.getElementById("due_date").setAttribute("min", today);
+        });
+    </script>
+    <script>
         const validUserIds = {{ valid_user_ids | tojson }};
     </script>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/filter_style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tasks.css') }}">
 {% endblock %}
