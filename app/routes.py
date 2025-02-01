@@ -22,7 +22,7 @@ from app.services.tasks_service import (
 
 from app.services.inventory_service import (
     get_all_inventory_items,
-    update_inventory_item
+    update_inventory_item, create_inventory_item
 )
 
 from app.services.booking_service import (
@@ -388,10 +388,33 @@ def inventory():
 
         return redirect(url_for('main.inventory'))
 
+    # Get categories for dropdown
+    categories = db.session.execute(
+        text("SELECT category_id, category_name FROM InventoryCategories ORDER BY category_name")
+    ).fetchall()
+
     # If GET, just fetch + display
     items = get_all_inventory_items()
-    return render_template("inventory.html", items=items)
+    return render_template("inventory.html", items=items, categories=categories)
 
+
+@main.route('/inventory/add_item', methods=['POST'])
+@login_required
+@role_required('technician', 'admin')
+def add_inventory_item():
+    response, status_code = create_inventory_item(request.form)
+
+    if status_code == 200:
+        flash(response['message'], 'success')
+    else:
+        flash(response['error'], 'danger')
+
+    return redirect(url_for('main.inventory'))
+
+
+# -------------------------------------------------------------------
+#                      Admin / Verification Page
+# -------------------------------------------------------------------
 
 @main.route('/verification', methods=['GET'])
 @login_required

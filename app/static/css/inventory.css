@@ -1,6 +1,6 @@
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
     margin: 0;
     padding: 0;
 }
@@ -12,43 +12,32 @@ body {
     color: #2c3e50;
 }
 
-.container,
-.container-fluid,
-.container-lg,
-.container-md,
-.container-sm,
-.container-xl,
-.container-xxl {
+.container-fluid {
     max-width: 100%;
     margin: 20px auto;
     padding: 20px;
+}
+
+.card {
     border-radius: 10px;
-    background: #eef3f7;
+    background: white;
+    padding: 20px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .table {
-    --bs-table-color-type: initial;
-    --bs-table-bg-type: initial;
-    --bs-table-color-state: initial;
-    --bs-table-bg-state: initial;
-    --bs-table-color: #2c3e50;
-    --bs-table-bg: ;
-    --bs-table-border-color: #dee2e6;
-    --bs-table-accent-bg: transparent;
-    --bs-table-striped-color: #212529;
-    --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
-    --bs-table-active-color: #212529;
-    --bs-table-active-bg: rgba(0, 0, 0, 0.1);
-    --bs-table-hover-color: #212529;
-    --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+    width: 100%;
 }
 
-/* inventory.css */
+.table thead {
+    background-color: #c9cbef;
+    color: #2c3e50;
+}
+
 .btn-custom {
-    background-color: #74a9e3; /* Default button color */
-    color: white; /* White text */
-    border: none; /* Remove border */
+    background-color: #74a9e3;
+    color: white;
+    border: none;
 }
 
 .btn-custom:hover {
@@ -56,16 +45,99 @@ body {
     color: white;
 }
 
-.table {
-    width: 100%;
+.nav-tabs .nav-link {
+    color: #2c3e50;
+}
 
+.nav-tabs .nav-link.active {
+    font-weight: bold;
+    background-color: #c9cbef;
 }
 
 .table thead {
     background-color: #c9cbef;
-    /*color: #7e71b5;*/
 }
 
-.inventory-header {
-    text-align: left;
+.table tbody tr:nth-child(even) {
+    background-color: #eef3f7;
+}
+
+.table-danger {
+    background-color: #f8d7da !important;
+}
+
+.btn-primary {
+    background-color: #74a9e3;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Add to inventory.css */
+.form-check-input:checked {
+    background-color: #74a9e3;
+    border-color: #74a9e3;
+}
+
+.form-check-label {
+    user-select: none;
+}
+
+#expiration_date:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+}
+
+/* Add these to inventory.css */
+.form-check-input:checked {
+    background-color: #74a9e3;
+    border-color: #74a9e3;
+}
+
+.form-check-label {
+    user-select: none;
+}
+
+#expiration_date:disabled {
+    background-color: #e9ecef;
+    opacity: 0.7;
+}
+
+#contact_info {
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 100px; /* Set a minimum height */
+}
+
+.form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.3em;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background-color: #74a9e3;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.card {
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

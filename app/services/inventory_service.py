@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import text
 from app import db
 
+
 def get_all_inventory_items():
     items_query = text("""
         SELECT i.item_id, i.name, i.reorder_level, i.category_id, c.category_name
@@ -52,6 +53,7 @@ def get_all_inventory_items():
 
     return formatted_items
 
+
 def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=None):
     """
     Calls the 'update_inventory' PostgreSQL function to add or replace
@@ -59,6 +61,7 @@ def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=N
     the single "no expiry" row. Otherwise it merges into that date row.
     """
     try:
+        # First, update the inventory
         query = text("""
             SELECT update_inventory(
                 :item_id,
@@ -75,7 +78,28 @@ def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=N
             "expiration_date": expiration_date or None
         }).fetchone()
 
+        # Fetch the current inventory levels AFTER update
+        inventory_check = text("""
+            SELECT i.name, i.reorder_level, SUM(b.quantity) AS total_qty
+            FROM InventoryItems i
+            JOIN InventoryBatches b ON i.item_id = b.item_id
+            WHERE i.item_id = :item_id
+            GROUP BY i.name, i.reorder_level;
+        """)
+
+        current_item = db.session.execute(inventory_check, {"item_id": item_id}).fetchone()
+
         db.session.commit()
+
+        # If stock is low, create a low stock task
+        if current_item and current_item.total_qty <= current_item.reorder_level:
+            _create_low_stock_task_for_techs(
+                item_name=current_item.name,
+                item_id=item_id,
+                reorder_level=current_item.reorder_level,
+                current_qty=current_item.total_qty
+            )
+            db.session.commit()  # Ensure the task is added to the database
 
         if result and result.result == 'Inventory updated successfully':
             return {"message": "Inventory updated successfully"}, 200
@@ -85,11 +109,9 @@ def update_inventory_item(item_id, new_quantity, performed_by, expiration_date=N
     except Exception as e:
         db.session.rollback()
         return {"error": str(e)}, 500
+
+
 def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_qty):
-    """
-    Helper function that inserts a new "low stock" task in the 'Tasks' table,
-    assigned to all technicians.
-    """
     technicians_sql = text("""
         SELECT user_id
         FROM Users
@@ -130,3 +152,40 @@ def _create_low_stock_task_for_techs(item_name, item_id, reorder_level, current_
             "tid": new_task_id,
             "uid": row.user_id
         })
+
+
+def create_inventory_item(item_data):
+    try:
+        # Call the PostgreSQL function
+        query = text("""
+            SELECT create_inventory_item(
+                :item_name,
+                :category_id,
+                :reorder_level,
+                :supplier_name,
+                :contact_info,
+                :no_expiry,
+                :expiration_date
+            ) AS result;
+        """)
+
+        result = db.session.execute(query, {
+            "item_name": item_data['item_name'],
+            "category_id": item_data['category_id'],
+            "reorder_level": item_data['reorder_level'],
+            "supplier_name": item_data.get('supplier_name'),
+            "contact_info": item_data.get('contact_info'),
+            "no_expiry": item_data.get('no_expiry') == 'on',  # Convert checkbox value to boolean
+            "expiration_date": item_data.get('expiration_date')
+        }).fetchone()
+
+        db.session.commit()
+
+        if result and result.result == 'Item added successfully':
+            return {"message": result.result}, 200
+        else:
+            return {"error": "Failed to add item"}, 400
+
+    except Exception as e:
+        db.session.rollback()
+        return {"error": f"Database error: {str(e)}"}, 500

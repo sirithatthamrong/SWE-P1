@@ -1,34 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[id^="no_expiry_"]').forEach(checkbox => {
-        checkbox.addEventListener("change", function () {
-            let itemId = this.id.replace("no_expiry_", "");
-            let expiryInput = document.getElementById("exp_date_" + itemId);
+    const searchBar = document.getElementById("search-bar");
+    const applyFiltersButton = document.getElementById("apply-filters");
+    const categoryFilters = document.querySelectorAll(".category-filter");
+    const inventoryTable = document.getElementById("inventory-table");
+    const tbody = inventoryTable.querySelector("tbody");
+    const mainRows = tbody.querySelectorAll("tr[data-name]"); // Get main item rows
 
-            if (this.checked) {
-                expiryInput.value = ""; // Clear input
-                expiryInput.disabled = true; // Disable field
-            } else {
-                expiryInput.disabled = false; // Enable field
+    function filterItems() {
+        const searchTerm = searchBar.value.toLowerCase().trim();
+
+        // Get all selected category names
+        const selectedCategories = Array.from(categoryFilters)
+            .filter(filter => filter.checked)
+            .map(filter => filter.nextElementSibling.textContent.toLowerCase().trim()); // Use category name
+
+        mainRows.forEach(row => {
+            const itemName = row.getAttribute("data-name").toLowerCase();
+            const categoryName = row.children[1].textContent.toLowerCase().trim(); // Get category name from table
+
+            const matchesSearch = searchTerm === "" || itemName.includes(searchTerm);
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(categoryName);
+
+            const shouldShow = matchesSearch && matchesCategory;
+            row.style.display = shouldShow ? "" : "none";
+
+            // Also hide/show batch rows immediately following the item row
+            let batchRow = row.nextElementSibling;
+            if (batchRow && !batchRow.hasAttribute("data-name")) {
+                batchRow.style.display = shouldShow ? "" : "none";
             }
         });
-    });
-});
+    }
 
-
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[name="new_quantity"]').forEach(input => {
-        input.addEventListener("input", function () {
-            let row = this.closest("tr");
-            let expiryInput = row.querySelector('[name="expiration_date"]');
-            let hasExpiry = row.querySelector("td span").textContent.trim() === "Has Expiry";
-
-            if (hasExpiry) {
-                expiryInput.style.display = "inline-block";
-                expiryInput.disabled = false;
-            } else {
-                expiryInput.style.display = "none";
-                expiryInput.disabled = true;
-            }
-        });
-    });
+    applyFiltersButton.addEventListener("click", filterItems);
+    searchBar.addEventListener("input", filterItems);
 });
