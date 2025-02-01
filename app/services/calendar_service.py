@@ -18,7 +18,7 @@ def fetch_calendar_data(user_id):
         JOIN LabRooms L 
             ON R.lab_room_id = L.lab_room_id
         WHERE R.user_id = :user_id  
-          AND R.action in ('active', 'archived')
+          AND R.action IN ('active', 'archived')
         ORDER BY R.date ASC, R.start_time ASC
     """)
     reservations_result = db.session.execute(reservations_query, {"user_id": user_id})
@@ -37,16 +37,16 @@ def fetch_calendar_data(user_id):
     ]
 
     # Filter upcoming reservations
-    today_iso = datetime.now().date().isoformat()
     upcoming_reservations = [res for res in reservations]
-    # upcoming_reservations = [res for res in reservations if res["date"] >= today_iso]
 
-    # Fetch tasks
+    # Fetch tasks assigned to the user (including the ones they created)
     tasks_query = text("""
-        SELECT task_id, task_name, priority, status, due_date
-        FROM Tasks
-        WHERE created_by = :user_id
-        ORDER BY due_date
+        SELECT T.task_id, T.task_name, T.priority, T.status, T.due_date
+        FROM Tasks T
+        JOIN TaskAssignments TA ON T.task_id = TA.task_id
+        WHERE TA.user_id = :user_id 
+          AND T.status NOT IN ('completed')
+        ORDER BY T.due_date
     """)
     tasks_result = db.session.execute(tasks_query, {"user_id": user_id})
 
