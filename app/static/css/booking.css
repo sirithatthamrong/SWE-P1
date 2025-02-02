@@ -148,7 +148,6 @@ body {
     transition: all 0.3s ease-in-out;
     text-align: center;
     padding: 10px;
-    text-align: center;
     white-space: normal;  /* Allows wrapping */
     overflow: hidden;
     text-overflow: ellipsis;
@@ -234,16 +233,12 @@ body {
 
 /* --- Recent Activities --- */
 .recent-bookings-container {
-    /*display: flex;*/
-    /*flex-direction: column;*/
     width: 100%;
     margin: 20px auto;
     padding: 20px;
     background: #eef3f7;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    /*justify-content: space-between;*/
-    /*gap: 30px;*/
 }
 
 .recent-bookings-container h3 {
@@ -271,7 +266,6 @@ body {
 .booking-table thead {
     background: #7e71b5;
     color: white;
-    /*height: 25px;*/
 }
 
 .booking-table th {
