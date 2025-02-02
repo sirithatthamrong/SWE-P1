@@ -38,14 +38,27 @@ document.addEventListener("DOMContentLoaded", function () {
             })),
 
             // Add tasks
-            ...tasks.map(task => ({
-                title: `[Task] ${task.task_name}`,
-                start: task.due_date,
-                color: task.priority === "high" ? "#dc3545" :
-                    task.priority === "medium" ? "#ffc107" : "#28a745",
-                textColor: "white",
-                allDay: true
-            }))
+            ...tasks.map(task => {
+                if (task.priority === "medium") {
+                    return ({
+                        title: `[Task] ${task.task_name}`,
+                        start: task.due_date,
+                        color: task.priority === "high" ? "#dc3545" :
+                            "#ffc107",
+                        textColor: "white",
+                        allDay: true
+                    });
+                } else {
+                    return ({
+                        title: `[Task] ${task.task_name}`,
+                        start: task.due_date,
+                        color: task.priority === "high" ? "#dc3545" :
+                            "#28a745",
+                        textColor: "white",
+                        allDay: true
+                    });
+                }
+            })
         ],
         eventClick: function (info) {
             alert(`📌 Title: ${info.event.title}\n📅 Date: ${info.event.start.toISOString()}`);
